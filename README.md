@@ -1,2 +1,2 @@
-# Capstone
-Senior Capstone 2020
+# ML Prototypes
+This is a home for any exploratory code related to the portfolio management part of the project
