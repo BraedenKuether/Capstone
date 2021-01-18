@@ -1,8 +1,10 @@
 import pyEX as p
+import torch
+
 class Portfolio:
     def __init__(self,assets,client):
         self.symbols = assets
-        self.rawAssets = []
+        self.featurized = None 
         self.assetsByTime = []
         self.numAssets = len(assets)
         self.client = client 
@@ -10,18 +12,19 @@ class Portfolio:
         for a in assets:
             self.assetsByTime.append(self.stockDF(self.client,a,0))
 
-        self.rawAssets = self.toRaw(self.assetsByTime)
+        self.featurized = self.featurize(self.assetsByTime)
+        self.printAssets()
 
     def printAssets(self):
-        for x in self.assetsByTime:
-            print(x[:10])
+        print(self.assetsByTime[0]['close'][:10])
+        print(self.featurized[:10,0])
 
     def stockDF(self,client, symb, interval):
         #the time of data appears to be inconsistent
         #may need to check this down the road
         return client.chartDF(symb,timeframe='5y')
     
-    def toRaw(self,assets):
+    def featurize(self,assets):
         feats = ['close','open','high','volume',\
              'uClose','uHigh','uLow','uVolume',\
              'fOpen','fClose','fHigh','fLow','fVolume']
@@ -29,9 +32,11 @@ class Portfolio:
         for a in assets:
             vals = []
             for f in feats:
-                vals.append(list(reversed(a[f].values)))
-            FV.append(vals)
-        return FV
+                vals.append(list((a[f].values)))
+            tens = torch.tensor(vals).T
+            FV.append(tens)
+        catted = torch.cat(FV,1)
+        return catted 
  
 
     def batch(self):
@@ -42,7 +47,7 @@ client = p.Client(version="sandbox")
 stonks = ['vti', 'agg', 'dbc', 'vixy']
 
 p = Portfolio(stonks,client)
-p.printAssets()
+#p.printAssets()
 
 
 
