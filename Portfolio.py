@@ -1,6 +1,7 @@
 import pyEX as p
 import torch
-
+import pandas as pd
+import matplotlib.pyplot as plt
 class Portfolio:
     def __init__(self,assets,client):
         self.symbols = assets
@@ -13,10 +14,9 @@ class Portfolio:
             self.assetsByTime.append(self.stockDF(self.client,a,0))
 
         self.featurized = self.featurize(self.assetsByTime)
-        self.printAssets()
 
     def printAssets(self):
-        print(self.assetsByTime[0]['close'][:10])
+        print(self.assetsByTime[0][:10,0])
         print(self.featurized[:10,0])
 
     def stockDF(self,client, symb, interval):
@@ -25,6 +25,7 @@ class Portfolio:
         return client.chartDF(symb,timeframe='5y')
     
     def featurize(self,assets):
+        #NEED TO ADD RETURNS
         feats = ['close','open','high','volume',\
              'uClose','uHigh','uLow','uVolume',\
              'fOpen','fClose','fHigh','fLow','fVolume']
