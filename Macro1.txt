@@ -1,0 +1,90 @@
+Option Explicit
+Dim FOLDERPATH As String
+Dim SECFILE As String
+Dim THISYEAR As Long
+
+Sub main()
+Call findGlobals
+'Call findCompetitors
+Call getIncomeStatement
+End Sub
+
+
+Sub findGlobals()
+FOLDERPATH = ThisWorkbook.Path
+THISYEAR = YEAR(Date)
+SECFILE = FOLDERPATH & "\" & Dir(FOLDERPATH & "\*" & ".xlsx")
+End Sub
+
+
+' Ignore for now
+Sub findCompetitors()
+Dim numCompetitors As Long
+Dim competitor As String
+competitor = Dir(FOLDERPATH & "\*" & ".xlsx")
+If competitor <> "" Then
+    numCompetitors = numCompetitors + 1
+End If
+MsgBox (numCompetitors)
+End Sub
+
+
+Sub getIncomeStatement()
+Application.ScreenUpdating = False
+Dim wb1 As Excel.Workbook
+Dim wb2 As Excel.Workbook
+Dim ws1 As Excel.Worksheet
+Dim ws2 As Excel.Worksheet
+Dim i As Long
+Dim frow As Long
+Dim trow As Long
+Dim fcol As Long
+Dim tcol As Long
+Dim frowEnd As Long
+Dim yr As Long
+Dim yrCheck As Long
+Dim numYears As Long
+
+frow = 2
+trow = 7
+fcol = 2
+tcol = 7
+numYears = 3
+
+Set wb1 = Workbooks.Open(SECFILE)
+Set wb2 = ThisWorkbook
+Set ws1 = wb1.Sheets("CONSOLIDATED STATEMENTS OF INCO")
+Set ws2 = wb2.Sheets("IS")
+
+Call getLineItems(ws1, ws2, trow)
+
+For i = 1 To numYears
+    yr = findYear(ws1, frow, fcol)
+    If i = 1 Then
+        yrCheck = yr
+    Else
+        yrCheck = yrCheck - 1
+        If yrCheck <> yr Then
+            MsgBox ("Potential mismatch with years")
+            MsgBox (yr)
+            MsgBox (yrCheck)
+        End If
+    End If
+    frowEnd = Cells(Rows.Count, fcol).End(xlUp).row
+    ws1.Range(Cells(frow + 1, fcol), Cells(frowEnd, fcol)).Copy Destination:=ws2.Cells(trow, tcol) 'Destination:=ws2.Range(Cells(tcol, trow), Cells(tcol, trow + frowEnd))
+    fcol = fcol + 1
+    tcol = tcol - 1
+Next i
+
+End Sub
+
+Function findYear(ws1 As Worksheet, row As Long, col As Long)
+findYear = Right(Cells(row, col), 4)
+End Function
+
+Sub getLineItems(ws1 As Worksheet, ws2 As Worksheet, trow As Long)
+Dim frowEnd As Long
+
+frowEnd = Cells(Rows.Count, 1).End(xlUp).row
+ws1.Range(Cells(3, 1), Cells(frowEnd, 1)).Copy Destination:=ws2.Cells(trow, 2) 'First column of SEC file to second column of template
+End Sub
