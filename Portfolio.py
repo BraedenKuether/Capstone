@@ -9,10 +9,20 @@ class Portfolio:
         self.assetsByTime = []
         self.numAssets = len(assets)
         self.client = client 
-
+        
+        m = 10000000000
+        tmp = []
         for a in assets:
-            self.assetsByTime.append(self.stockDF(self.client,a,0))
+            data = self.stockDF(self.client,a,0)
+            m = min(m,len(data))
+            print(len(data))
+            tmp.append(data)
+        for a in tmp:
+            self.assetsByTime.append(a[:m])
 
+        for a in self.assetsByTime:
+            print(len(a)) 
+        
         self.featurized = self.featurize(self.assetsByTime)
 
     def printAssets(self):
@@ -44,11 +54,6 @@ class Portfolio:
         pass             
 
 
-client = p.Client(version="sandbox")
-stonks = ['vti', 'agg', 'dbc', 'vixy']
-
-p = Portfolio(stonks,client)
-#p.printAssets()
 
 
 
