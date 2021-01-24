@@ -1,0 +1,26 @@
+header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    background-color: rgb(165, 165, 165);
+    margin-bottom: 50px;
+}
+
+.navbar-item {
+    list-style-type: none;
+    display: inline;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    right: 5%;
+    left: 5%;
+}
+
+#calendar {
+    outline: solid 5px black;
+    padding: 10px;
+    position: absolute;
+    top: 100px;
+}
