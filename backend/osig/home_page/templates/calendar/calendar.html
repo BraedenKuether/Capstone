@@ -4,10 +4,22 @@
     <meta charset="utf-8">
     <title>My test page</title>
 
-    { % load static % }
-    <link rel="stylesheet" type="text/css" href="{% static 'calendar/style.css' %}">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'home_page/style.css' %}">
+
+    <header>
+      <nav class="navbar">
+        <ul>
+          <li class="navbar-item"><a href="">YEE</a></li>
+          <li class="navbar-item"><a href="">YEE</a></li>
+          <img scr="{% static 'home_page/osig-word-logo-transparent.jpg' %}" alt="OSIG Logo">
+          <li class="navbar-item"><a href="">YEE</a></li>
+          <li class="navbar-item"><a href="">YEE</a></li>
+        </ul>
+      </nav>
+    </header>
   </head>
   <body>
-    <iframe src="https://calendar.google.com/calendar/embed?src=oregonstate.edu_h8k929p1os2a1308crm54q8ihg%40group.calendar.google.com&ctz=America%2FLos_Angeles" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+    <iframe id="calendar" src="https://calendar.google.com/calendar/embed?src=oregonstate.edu_h8k929p1os2a1308crm54q8ihg%40group.calendar.google.com&ctz=America%2FLos_Angeles" style="border: 0" width="600" height="400" frameborder="0" scrolling="no"></iframe>
   </body>
 </html>
