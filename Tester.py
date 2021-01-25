@@ -33,6 +33,21 @@ class Tester:
         std = np.sqrt(var)
 
         return (var,std)
+    
+    def sharpe(self,weights,riskFree=0.0):
+         
+        returns = [x['close']/x.iloc[0]['close'] for x in self.portfolio.assetsByTime]  
+        returns = pd.concat(returns,axis=1)
+
+        returns['total'] = returns.dot(weights)
+        returns['daily return'] = returns['total'].pct_change()
+
+        mu = returns['daily return'].mean()
+        std = returns['daily return'].std()
+        sharpe = mu/std
+
+        return (252**.5)*sharpe
+
 
     def plotPortfolio(self,key="close"):
         plot = plt.gca()
@@ -46,11 +61,11 @@ class Tester:
 
 
 client = px.Client(version="sandbox")
-stonks = ['nvs', 'aapl', 'msft', 'goog']
+stonks = ['aapl', 'csco', 'ibm', 'amzn']
 
 p = p.Portfolio(stonks,client)
 
 ts = Tester(p)
 
-x = ts.risk(np.array([.20,.30,.30,.20]))
+x = ts.sharpe(np.array([.35,.15,.15,.35]))
 print(x)
