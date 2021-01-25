@@ -10,7 +10,7 @@ class Portfolio:
         self.numAssets = len(assets)
         self.client = client 
         
-        m = 10000000000
+        m = float('inf')
         tmp = []
         for a in assets:
             data = self.stockDF(self.client,a,0)
