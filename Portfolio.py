@@ -14,6 +14,10 @@ class Portfolio:
         tmp = []
         for a in assets:
             data = self.stockDF(self.client,a,0)
+            print(data['close'].tail(10))
+            print(data['open'].tail(10))
+            data["returns"] = data["close"].values-data["open"].values
+            print(data['returns'].tail(10))
             m = min(m,len(data))
             print(len(data))
             tmp.append(data)
@@ -44,8 +48,11 @@ class Portfolio:
             vals = []
             for f in feats:
                 vals.append(list((a[f].values)))
+            returns = list(a['close'].values-a['open'].values)
+            vals.append(returns)
             tens = torch.tensor(vals).T
             FV.append(tens)
+
         catted = torch.cat(FV,1)
         return catted 
  
