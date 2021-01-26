@@ -14,12 +14,8 @@ class Portfolio:
         tmp = []
         for a in assets:
             data = self.stockDF(self.client,a,0)
-            print(data['close'].tail(10))
-            print(data['open'].tail(10))
             data["returns"] = data["close"].values-data["open"].values
-            print(data['returns'].tail(10))
             m = min(m,len(data))
-            print(len(data))
             tmp.append(data)
         for a in tmp:
             self.assetsByTime.append(a[:m])
@@ -39,7 +35,6 @@ class Portfolio:
         return client.chartDF(symb,timeframe='5y')
     
     def featurize(self,assets):
-        #NEED TO ADD RETURNS
         feats = ['close','open','high','volume',\
              'uClose','uHigh','uLow','uVolume',\
              'fOpen','fClose','fHigh','fLow','fVolume']

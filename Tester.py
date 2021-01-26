@@ -2,8 +2,10 @@ import pyEX as px
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
+from scipy import stats
 import Portfolio as p
+
+client = px.Client(version="sandbox")
 
 class Tester:
 
@@ -48,6 +50,27 @@ class Tester:
 
         return (252**.5)*sharpe
 
+    
+    def alphabeta(self,weights,market="SPY",withPlot=True):
+        closes = [x['close'] for x in self.portfolio.assetsByTime]
+        closes = pd.concat(closes,axis=1)
+        
+        returns = closes.pct_change()[1:]
+        returns = returns.dot(weights)
+
+        benchMark = client.chartDF(market,timeframe='5y')['close'].pct_change()[1:]
+        
+        beta,alpha = stats.linregress(benchMark.values,returns.values)[0:2]
+        
+        if withPlot:
+            x = benchMark.values
+            y = returns.values
+            plt.plot(x,y,'o',label="returns")
+            plt.plot(x,alpha + beta*x, 'r', label="fitted line")
+            plt.legend()
+            plt.show()
+        return (round(alpha,4),round(beta,4))
+        
 
     def plotPortfolio(self,key="close"):
         plot = plt.gca()
@@ -60,12 +83,10 @@ class Tester:
         plt.show()
 
 
-client = px.Client(version="sandbox")
-stonks = ['aapl', 'csco', 'ibm', 'amzn']
-
+stonks = ['aapl', 'msft', 'amzn', 'fb']
 p = p.Portfolio(stonks,client)
 
 ts = Tester(p)
 
-x = ts.sharpe(np.array([.35,.15,.15,.35]))
-print(x)
+a,b = ts.alphabeta(np.array([.1,.2,.25,.2]))
+print(a,b)
