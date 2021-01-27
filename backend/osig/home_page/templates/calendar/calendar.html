@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>OSIG Home</title>
+
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'home_page/style.css' %}">
+    
+  </head>
+
+  <body>
+    <header>
+      {% block navbar %}
+      <nav>
+        <ul id="navbar">
+          <li class="navbar-item">{% block nav-home %}<a href="{% url 'home_page' %}">Home</a>{% endblock nav-home %}</li>
+          <li class="navbar-item"><a href="{% url 'home_page' %}">Stock Research</a></li>
+          <a href="{% url 'home_page' %}"><img src="../../static/home_page/images/osig-word-logo-transparent.jpg" alt="OSIG Logo" /></a>
+          <li class="navbar-item"><a href="{% url 'home_page' %}">Portfolio Analysis</a></li>
+          <li class="navbar-item"><a href="{% url 'home_page' %}">About</a></li>
+        </ul>
+      </nav>
+      {% endblock navbar %}
+    <header>
+
+    <iframe id="calendar" src="https://calendar.google.com/calendar/embed?src=oregonstate.edu_h8k929p1os2a1308crm54q8ihg%40group.calendar.google.com&ctz=America%2FLos_Angeles" style="border: 0" width="600" height="400" frameborder="0" scrolling="no"></iframe>
+  </body>
+
+</html>

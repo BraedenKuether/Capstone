@@ -1,0 +1,42 @@
+body {
+    margin-bottom: 60px;
+}
+
+header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    background: #bbbbbb;
+}
+
+nav {
+    height: 100px;
+}
+
+#navbar {
+    display: flex;
+    justify-content: space-around;
+    list-style-type: none;
+    padding-top: 25px;
+}
+
+.navbar-item {
+    padding: 5px;
+}
+
+.navbar-item a {
+    font-family: Quicksand;
+    font-style: normal;
+    font-size: 18px;
+    text-align: center;
+    color: black;
+    text-decoration: none;
+}
+
+#calendar {
+    outline: solid 5px black;
+    padding: 10px;
+    position: absolute;
+    top: 150px;
+}
