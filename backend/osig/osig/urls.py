@@ -18,6 +18,5 @@ from django.urls import include, path
 
 urlpatterns = [
     path('home_page/', include('home_page.urls')),
-    path('osig_calendar/', include('osig_calendar.urls')),
     path('admin/', admin.site.urls),
 ]
