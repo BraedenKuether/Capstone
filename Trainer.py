@@ -7,18 +7,19 @@ def sharpe_loss(weights, batch_pos, batch_len, returns):
   total_ratio = 0
   er = 0
   er2 = 0
-  risk_free_rate = 0.09
+  annual_risk_free_rate = 1.09
+  daily_risk_free_rate = annual_risk_free_rate ** (1/365)
   er_list = []
   for batch in range(batch_len):
     r_i_t = returns[batch]
     curr_er = torch.dot(r_i_t, weights[batch])
-    er += curr_er
+    er += (curr_er - daily_risk_free_rate**TIME_PERIOD_LENGTH)
     er2 += curr_er**2
     er_list.append(curr_er)
   er_list = torch.Tensor(er_list)
   er = er/batch_len
   er2 = er2/batch_len
-  ratio = (er-risk_free_rate) / torch.std(er_list)
+  ratio = er / torch.std(er_list)
   ratio = -1 * ratio
   return ratio
   
