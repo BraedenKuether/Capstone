@@ -18,7 +18,7 @@
         <ul id="navbar">
           <li class="navbar-item">{% block nav-home %}<a href="{% url 'home_page' %}">Home</a>{% endblock nav-home %}</li>
           <li class="navbar-item"><a href="{% url 'home_page' %}">Stock Research</a></li>
-          <img src="../../static/home_page/images/osig-word-logo-transparent.jpg" alt="OSIG Logo" />
+          <a href="{% url 'home_page' %}"><img src="../../static/home_page/images/osig-word-logo-transparent.jpg" alt="OSIG Logo" /></a>
           <li class="navbar-item"><a href="{% url 'home_page' %}">Portfolio Analysis</a></li>
           <li class="navbar-item"><a href="{% url 'home_page' %}">About</a></li>
         </ul>
