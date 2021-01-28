@@ -22,11 +22,15 @@ class Tester:
         print(self.numFeats)
         self.dataset = Dataset.PortfolioDataSet(P.featurized,timePeriod,P.numAssets,self.numFeats,batchSize)
 
-    def runModel(self):
+    def trainModel(self):
         train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
-        
-    def cumulativeReturns(self,weights,withPlot=True):
-        closes = [x['close'] for x in self.portfolio.assetsByTime]
+    
+    def trainTest(self,split):
+        w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        self.cumulativeReturns(w,split)
+
+    def cumulativeReturns(self,weights,slice=None,withPlot=True):
+        closes = [x['close'] for x in self.portfolio.assetsByTime[:slice]]
         catted = pd.concat(closes,axis=1)
         returns = catted.pct_change()
         returns['pdr'] = returns.dot(weights)
@@ -101,6 +105,8 @@ p = p.Portfolio(stonks,client)
 
 ts = Tester(p,5,2)
 
+#ts.trainTest(1200)
+'''
 r = ts.cumulativeReturns([.25,.25,.25,.25])
 r = r.dropna(0,'any')
 jsons = []
@@ -119,3 +125,4 @@ jstr = json.dumps(jsons)
 f = open('graph.json',"w")
 f.write(jstr)
 f.close()
+'''

@@ -19,6 +19,8 @@ class Portfolio:
             tmp.append(data)
         for a in tmp:
             self.assetsByTime.append(a[:m])
+        
+        print(self.assetsByTime[0][:30])
 
         for a in self.assetsByTime:
             print(len(a)) 

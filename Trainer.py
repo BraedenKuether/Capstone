@@ -37,6 +37,7 @@ def train_net(d,timePeriod,numAssets,numFeatures,batchSize):
     loss_fn = sharpe_loss
     total_time = 0
     simulation_day = 0
+    weights = []
     for i in range(len(d)):
       start = time.time()
       #print("step {}".format(i))
@@ -51,8 +52,6 @@ def train_net(d,timePeriod,numAssets,numFeatures,batchSize):
             weights = sim_out[0].view(numAssets)
             percent_change = torch.dot(d.future_returns(future_index)[0], weights)
             overall_val *= 1 + percent_change
-            #print("weights:", weights)
-            #print("current:", d[i][0][-1].view(NUM_ASSETS, int(NUM_FEATURES/NUM_ASSETS))[:,0], "future:", d.future_returns(i)[0])
             print("return:",overall_val)
             print("allocs: ",weights)
         
@@ -71,4 +70,4 @@ def train_net(d,timePeriod,numAssets,numFeatures,batchSize):
         simulation_day = 0
 
     print(overall_val)
-    return net
+    return weights,net 
