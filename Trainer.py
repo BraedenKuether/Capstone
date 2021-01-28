@@ -28,6 +28,7 @@ def sharpe_loss(weights, batch_pos, batch_len, returns):
   
   
 def train_net(d,timePeriod,numAssets,numFeatures,batchSize):
+    print(d)
     overall_val = 1
     start_day = 0
     net = Net(numFeatures,numAssets,timePeriod).to('cuda')

@@ -27,10 +27,10 @@ class Tester:
     
     def trainTest(self,split):
         w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
-        self.cumulativeReturns(w,split)
+        self.cumulativeReturns(w,slice(split,None))
 
-    def cumulativeReturns(self,weights,slice=None,withPlot=True):
-        closes = [x['close'] for x in self.portfolio.assetsByTime[:slice]]
+    def cumulativeReturns(self,weights,slice=slice(None),withPlot=True):
+        closes = [x['close'] for x in self.portfolio.assetsByTime[slice]]
         catted = pd.concat(closes,axis=1)
         returns = catted.pct_change()
         returns['pdr'] = returns.dot(weights)
@@ -105,7 +105,7 @@ p = p.Portfolio(stonks,client)
 
 ts = Tester(p,5,2)
 
-#ts.trainTest(1200)
+ts.trainTest(1200)
 '''
 r = ts.cumulativeReturns([.25,.25,.25,.25])
 r = r.dropna(0,'any')
