@@ -3,15 +3,28 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
+import json
+
 import Portfolio as p
+import Dataset 
+import Model
+from Trainer import sharpe_loss,train_net 
 
 client = px.Client(version="sandbox")
 
 class Tester:
 
-    def __init__(self,P):
+    def __init__(self,P,timePeriod,batchSize):
         self.portfolio = P
+        self.time = timePeriod
+        self.batch = batchSize
+        self.numFeats = p.featurized.shape[1]
+        print(self.numFeats)
+        self.dataset = Dataset.PortfolioDataSet(P.featurized,timePeriod,P.numAssets,self.numFeats,batchSize)
 
+    def runModel(self):
+        train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        
     def cumulativeReturns(self,weights,withPlot=True):
         closes = [x['close'] for x in self.portfolio.assetsByTime]
         catted = pd.concat(closes,axis=1)
@@ -83,10 +96,26 @@ class Tester:
         plt.show()
 
 
-stonks = ['aapl', 'msft', 'amzn', 'fb']
+stonks = ['vti', 'agg', 'dbc', 'vixy']
 p = p.Portfolio(stonks,client)
 
-ts = Tester(p)
+ts = Tester(p,5,2)
 
-a,b = ts.alphabeta(np.array([.1,.2,.25,.2]))
-print(a,b)
+r = ts.cumulativeReturns([.25,.25,.25,.25])
+r = r.dropna(0,'any')
+jsons = []
+xs = r['pdr'].index.strftime("%Y-%m-%d").values
+#ys = [x for x in r['pdr'].values if not np.isnan(x)]
+ys = r['pdr'].values
+print(ys)
+points = zip(xs,ys)
+d = {"id":"Cumulative Portfolio Returns",
+     "color": "hsl(29,70%,50%)",
+     "data":[{"x":x, "y":y} for x,y in points]}
+jsons.append(d)
+
+jstr = json.dumps(jsons)
+
+f = open('graph.json',"w")
+f.write(jstr)
+f.close()

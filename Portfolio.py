@@ -24,6 +24,7 @@ class Portfolio:
             print(len(a)) 
         
         self.featurized = self.featurize(self.assetsByTime)
+         
 
     def printAssets(self):
         print(self.assetsByTime[0][:10,0])

@@ -1,3 +1,8 @@
+import torch
+from sklearn.preprocessing import MinMaxScaler
+from torch.utils.data import Dataset
+torch.set_default_tensor_type('torch.cuda.FloatTensor')
+
 class PortfolioDataSet(Dataset):
   # assumes 5 year history for all assets need to generalize eventually
   def __init__(self,combined_data,TIME_PERIOD_LENGTH,NUM_ASSETS,NUM_FEATURES,BATCH_SIZE):
