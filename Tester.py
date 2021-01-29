@@ -26,14 +26,14 @@ class Tester:
         train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
     
     def trainTest(self,split):
-        w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
-        self.cumulativeReturns(w,slice(split,None))
+        w,_ = train_net(self.dataset,self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        self.cumulativeReturns(w,s=slice(split,None))
 
-    def cumulativeReturns(self,weights,slice=slice(None),withPlot=True):
-        closes = [x['close'] for x in self.portfolio.assetsByTime[slice]]
+    def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
+        closes = [x['close'][s] for x in self.portfolio.assetsByTime]
         catted = pd.concat(closes,axis=1)
         returns = catted.pct_change()
-        returns['pdr'] = returns.dot(weights)
+        returns['pdr'] = returns.dot(weights.cpu())
         returns = (1+returns).cumprod() 
         if withPlot:
             returns['pdr'].plot(title="Cumulative Returns")
