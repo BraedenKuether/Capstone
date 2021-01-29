@@ -27,13 +27,14 @@ class Tester:
     
     def trainTest(self,split):
         w,_ = train_net(self.dataset,self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        w = w.cpu()
         self.cumulativeReturns(w,s=slice(split,None))
 
     def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
         closes = [x['close'][s] for x in self.portfolio.assetsByTime]
         catted = pd.concat(closes,axis=1)
         returns = catted.pct_change()
-        returns['pdr'] = returns.dot(weights.cpu())
+        returns['pdr'] = returns.dot(weights)
         returns = (1+returns).cumprod() 
         if withPlot:
             returns['pdr'].plot(title="Cumulative Returns")
@@ -95,7 +96,7 @@ class Tester:
         for asset in self.portfolio.assetsByTime:
             asset.plot(y=key,ax=plot)            
 
-        legend(self.portfolio.symbols)
+        plt.legend(self.portfolio.symbols)
         plot.set_title("Daily "+key)
         plt.show()
 
@@ -105,7 +106,8 @@ p = p.Portfolio(stonks,client)
 
 ts = Tester(p,5,2)
 
-ts.trainTest(1200)
+ts.plotPortfolio()
+ts.cumulativeReturns([.25,.25,.25,.25])
 '''
 r = ts.cumulativeReturns([.25,.25,.25,.25])
 r = r.dropna(0,'any')
