@@ -1,9 +1,9 @@
 body {
-    margin-bottom: 60px;
+    margin: 0;
 }
 
 header {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     left: 0;
@@ -34,9 +34,55 @@ nav {
     text-decoration: none;
 }
 
-#calendar {
-    outline: solid 5px black;
-    margin: 20px;
+#contents {
     position: absolute;
     top: 125px;
+    left: 25px;
+    right: 25px;
+    bottom: 0;
+    margin-bottom: 30px;
+    display: flex;
+    /*outline: solid 3px black; */
+}
+
+#screenshot {
+    /* outline: solid 3px black; */
+    margin: 10px;
+    margin-top: 30px;
+    height: 90%;
+    width: 45%;
+    float: left;
+}
+
+#screenshot img {
+    height: 100%;
+    width: 100%;
+}
+
+#calendar {
+    position: absolute;
+    right: 0;
+    outline: solid 3px black;
+    margin: 20px;
+    width: 50%;
+    height: 45%;
+    float: right;
+}
+
+#resources {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 20px;
+    width: 50%;
+    height: 45%;
+    outline: solid 3px black;
+}
+
+#resources h1 {
+    font-family: Quicksand;
+    font-style: normal;
+    font-size: 18px;
+    text-align: center;
+    color: black;
 }
