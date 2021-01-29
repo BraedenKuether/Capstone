@@ -36,7 +36,7 @@ nav {
 
 #calendar {
     outline: solid 5px black;
-    padding: 10px;
+    margin: 20px;
     position: absolute;
-    top: 150px;
+    top: 125px;
 }
