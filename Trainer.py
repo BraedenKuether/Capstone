@@ -5,8 +5,7 @@ import math
 import time
 
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
-def sharpe_loss(weights, batch_pos, batch_len, returns,TIME_PERIOD_LENGTH):
-  total_ratio = 0
+def sharpe_loss(weights, batch_pos, batch_len, returns, TIME_PERIOD_LENGTH):
   total_ratio = 0
   er = 0
   er2 = 0
@@ -27,8 +26,8 @@ def sharpe_loss(weights, batch_pos, batch_len, returns,TIME_PERIOD_LENGTH):
   return ratio
   
   
-def train_net(d,dataSet,timePeriod,numAssets,numFeatures,batchSize):
-    print(d)
+def train_net(d,timePeriod,numAssets,numFeatures,batchSize):
+    #print(d)
     overall_val = 1
     start_day = 0
     net = Net(numFeatures,numAssets,timePeriod).to('cuda')
@@ -39,11 +38,11 @@ def train_net(d,dataSet,timePeriod,numAssets,numFeatures,batchSize):
     total_time = 0
     simulation_day = 0
     weights = []
-    for i in range(len(dataSet)):
+    for i in range(len(d)):
       start = time.time()
-      #print("step {}".format(i))
+      print("step {}".format(i))
       for epoch in range(num_epochs):
-        out = net.forward(dataSet[i], len(dataSet[i]))
+        out = net.forward(d[i], len(d[i]))
 
         future_index = math.ceil(i + (timePeriod/batchSize))
         if epoch == 0 and simulation_day == 0 and future_index < len(d):
@@ -56,7 +55,7 @@ def train_net(d,dataSet,timePeriod,numAssets,numFeatures,batchSize):
             print("return:",overall_val)
             print("allocs: ",weights)
         
-        loss = loss_fn(out, i, len(dataSet[i]), d.future_returns(i), timePeriod)
+        loss = loss_fn(out, i, len(d[i]), d.future_returns(i), timePeriod)
         losses_new_net.append(loss.item())
         
         optimizer.zero_grad()
@@ -65,10 +64,38 @@ def train_net(d,dataSet,timePeriod,numAssets,numFeatures,batchSize):
 
       total_time += time.time() - start
       avg_time = total_time/(i + 1)
-      print("eta: {}m {}s".format(int(avg_time/60 * (len(dataSet) - i - 1)), int((avg_time *(len(dataSet) - i - 1)) % 60 )))
-      simulation_day += len(dataSet[i])
+      print("eta: {}m {}s".format(int(avg_time/60 * (len(d) - i - 1)), int((avg_time *(len(d) - i - 1)) % 60 )))
+      simulation_day += len(d[i])
       if simulation_day >= timePeriod:
         simulation_day = 0
 
     print(overall_val)
     return weights,net 
+
+def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
+    overall_val = 1
+    simulation_day = 0
+    x = [testing_d.dates[0][0][0][0]]
+    y = [1]
+    print(testing_d.dates[0])
+    for i in range(len(testing_d)):
+      with torch.no_grad():
+        if simulation_day == 0:
+          #print("input:", testing_d[i])
+          out = net.forward(testing_d[i], len(testing_d[i]))
+          #print(out)
+          returns = testing_d.future_returns(i)[0]
+          weights = out[0].view(NUM_ASSETS)
+          print("weights:", weights)
+          print("current:", testing_d.current_day_prices[i][0], "future:", testing_d.future_day_prices[i][0], "calculated change:", returns)
+          percent_change = torch.dot(returns, weights)
+          overall_val *= (1 + percent_change)
+          print(overall_val)
+          x.append(testing_d.dates[0][i][0][0])
+          y.append(overall_val.item())
+        
+      simulation_day += len(testing_d[i])
+      if simulation_day >= TIME_PERIOD_LENGTH:
+        simulation_day = 0
+        
+    return x,y

@@ -1,12 +1,17 @@
 import torch
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import Dataset
+import numpy as np
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 class PortfolioDataSet(Dataset):
   # assumes 5 year history for all assets need to generalize eventually
-  def __init__(self,combined_data,TIME_PERIOD_LENGTH,NUM_ASSETS,NUM_FEATURES,BATCH_SIZE):
+  def __init__(self,combined_data,dates,TIME_PERIOD_LENGTH,NUM_ASSETS,NUM_FEATURES,BATCH_SIZE, testing = False, test_length = 126):
     self.raw = combined_data
+    if not testing:
+        self.testing_set = PortfolioDataSet(self.raw[-test_length:], dates[-test_length:],TIME_PERIOD_LENGTH,NUM_ASSETS,NUM_FEATURES,1,testing = True)
+        self.raw = self.raw[:(-test_length - TIME_PERIOD_LENGTH)]
+        dates = dates[:(-test_length - TIME_PERIOD_LENGTH)]
     self.n = NUM_ASSETS
     self.window = TIME_PERIOD_LENGTH
     self.features = NUM_FEATURES
@@ -16,6 +21,7 @@ class PortfolioDataSet(Dataset):
     self.returns = []
     self.future_day_prices = []
     self.current_day_prices = []
+    self.dates = []
     scaler = MinMaxScaler()
     i = 0
     while i + 2*self.window - 1 < len(self.raw):
@@ -30,6 +36,7 @@ class PortfolioDataSet(Dataset):
       self.returns.append(future_returns.tolist())
       self.current_day_prices.append(last_day_prices.tolist())
       self.future_day_prices.append(future_day_prices.tolist())
+      self.dates.append(dates[i:i+self.window].tolist())
       i += 1
 
     test_split = torch.split(torch.Tensor(self.non_normal_data), BATCH_SIZE)
@@ -39,6 +46,7 @@ class PortfolioDataSet(Dataset):
       self.returns = self.returns[1:]
       self.future_day_prices = self.future_day_prices[1:]
       self.current_day_prices = self.current_day_prices[1:]
+      self.dates = self.dates[1:]
 
 
     #print(torch.Tensor(self.data).shape)
@@ -47,6 +55,7 @@ class PortfolioDataSet(Dataset):
     self.returns = torch.split(torch.Tensor(self.returns),BATCH_SIZE)
     self.future_day_prices = torch.split(torch.Tensor(self.future_day_prices),BATCH_SIZE)
     self.current_day_prices = torch.split(torch.Tensor(self.current_day_prices),BATCH_SIZE)
+    self.dates = np.split(np.array(self.dates),BATCH_SIZE)
     
   def __len__(self):
     return len(self.data)

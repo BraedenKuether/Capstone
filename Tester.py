@@ -8,9 +8,10 @@ import json
 import Portfolio as p
 import Dataset 
 import Model
-from Trainer import sharpe_loss,train_net 
+from Trainer import sharpe_loss,train_net,validation_set
 
-client = px.Client(version="sandbox")
+IEX_TOKEN = "Tpk_647cd93d6c5842d6978e55c6f79b0e1a"
+client = px.Client(IEX_TOKEN, version="sandbox")
 
 class Tester:
 
@@ -20,15 +21,22 @@ class Tester:
         self.batch = batchSize
         self.numFeats = p.featurized.shape[1]
         print(self.numFeats)
-        self.dataset = Dataset.PortfolioDataSet(P.featurized,timePeriod,P.numAssets,self.numFeats,batchSize)
+        self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize)
+        self.trainModel()
+        self.testingSet()
 
     def trainModel(self):
-        train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        w, net = train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        self.net = net
     
-    def trainTest(self,split):
-        w,_ = train_net(self.dataset,self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
-        w = w.cpu()
-        self.cumulativeReturns(w,s=slice(split,None))
+    def testingSet(self):
+        #w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        #w,net = train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        #self.net = net
+        #w = w.cpu()
+        #self.cumulativeReturns(w,slice(split,None))
+        x,y = validation_set(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
+        self.validation_returns(x,y)
 
     def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
         closes = [x['close'][s] for x in self.portfolio.assetsByTime]
@@ -40,6 +48,14 @@ class Tester:
             returns['pdr'].plot(title="Cumulative Returns")
             plt.show()
         return returns
+    
+    def validation_returns(self,x,y):
+        plt.plot(x,y)
+        plt.xticks(x, rotation=45)
+        plt.margins(0.2)
+        plt.subplots_adjust(bottom=0.15)
+        plt.show()
+        
     
     def risk(self,weights):
         closes = [x['close'] for x in self.portfolio.assetsByTime]
