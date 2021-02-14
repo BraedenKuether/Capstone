@@ -19,11 +19,10 @@ class Tester:
         self.time = timePeriod
         self.batch = batchSize
         self.numFeats = p.featurized.shape[1]
-        print(self.numFeats)
         self.dataset = Dataset.PortfolioDataSet(P.featurized,timePeriod,P.numAssets,self.numFeats,batchSize)
 
     def trainModel(self):
-        train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+        train_net(self.dataset,self.dataset[:],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
     
     def trainTest(self,split):
         w,_ = train_net(self.dataset,self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
@@ -40,7 +39,30 @@ class Tester:
             returns['pdr'].plot(title="Cumulative Returns")
             plt.show()
         return returns
+   
+
+    def topbottom(self,weights):
+        symbs = self.portfolio.symbols
+        closes = [x['close'] for x in self.portfolio.assetsByTime]
+        changes = map(lambda stock: (stock.iloc[-1]-stock.iloc[0])/stock.iloc[0], closes)
+        changes = np.array(list(changes))
+        withSyms = list(zip(changes,symbs))
+        top = max(withSyms)
+        bottom = min(withSyms)
+        return (changes.dot(weights)) + 1,top,bottom 
+
+    def performance(self,weights,timePeriod="ytd"):
+        ytds = [client.chartDF(symbol=s,timeframe=timePeriod).sort_index()['close'] for s in self.portfolio.symbols]
+        changes = map(lambda stock: (stock.iloc[-1]-stock.iloc[0])/stock.iloc[0], ytds)
+        changes = np.array(list(changes))
+        top = max(changes)
+        top = min(changes)
+        return ((changes.dot(weights)) + 1) 
     
+    def spYTD(self,timePeriod="ytd"):
+         spy = client.chartDF(symbol="spy",timeframe=timePeriod).sort_index()['close']
+         return ((spy.iloc[-1]-spy.iloc[0])/spy.iloc[0]) + 1 
+
     def risk(self,weights):
         closes = [x['close'] for x in self.portfolio.assetsByTime]
         catted = pd.concat(closes,axis=1)
@@ -88,7 +110,59 @@ class Tester:
             plt.legend()
             plt.show()
         return (round(alpha,4),round(beta,4))
-        
+    
+    def peRatio(self,withPlot=True):
+        syms = self.portfolio.symbols 
+        pes = []
+        found = []
+        for i,s in enumerate(syms):
+            stats = client.advancedStatsDF(s)
+            peR = stats['peRatio'][0]
+            if peR != None:
+                pes.append(peR)
+                found.append(syms[i])
+
+        if found and withPlot:
+            plt.bar(range(len(pes)),pes)
+            plt.xticks(range(len(found)),found)
+            plt.show()
+        return np.mean(pes),pes 
+
+
+    def dividendYield(self,withPlot=True):
+        syms = self.portfolio.symbols 
+        divs = []
+        found = []
+        for i,s in enumerate(syms):
+            stats = client.keyStatsDF(s)
+            divY = stats['dividendYield'][0]
+            if divY != None:
+                divs.append(divY)
+                found.append(syms[i])
+
+        if found and withPlot:
+            plt.bar(range(len(divs)),divs)
+            plt.xticks(range(len(found)),found)
+            plt.show()
+        return syms 
+
+    def psRatio(self,withPlot=True):
+        syms = self.portfolio.symbols 
+        ps = []
+        found = []
+        for i,s in enumerate(syms):
+            stats = client.advancedStatsDF(s)
+            psR = stats['priceToSales'][0]
+            if psR != None:
+                ps.append(psR)
+                found.append(syms[i])
+
+        if found and withPlot:
+            plt.bar(range(len(ps)),ps)
+            plt.xticks(range(len(found)),found)
+            plt.show()
+        return np.mean(ps),ps 
+
 
     def plotPortfolio(self,key="close"):
         plot = plt.gca()
@@ -100,14 +174,14 @@ class Tester:
         plot.set_title("Daily "+key)
         plt.show()
 
-
-stonks = ['vti', 'agg', 'dbc', 'vixy']
+    
+stonks = ['aapl', 'msft', 'fb', 'goog']
 p = p.Portfolio(stonks,client)
 
 ts = Tester(p,5,2)
 
-ts.plotPortfolio()
-ts.cumulativeReturns([.25,.25,.25,.25])
+print(ts.topbottom([.25,.25,.25,.25]))
+
 '''
 r = ts.cumulativeReturns([.25,.25,.25,.25])
 r = r.dropna(0,'any')

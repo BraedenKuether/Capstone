@@ -24,11 +24,11 @@ def sharpe_loss(weights, batch_pos, batch_len, returns,TIME_PERIOD_LENGTH):
   er2 = er2/batch_len
   ratio = er / torch.std(er_list)
   ratio = -1 * ratio
+  print(ratio)
   return ratio
   
   
 def train_net(d,dataSet,timePeriod,numAssets,numFeatures,batchSize):
-    print(d)
     overall_val = 1
     start_day = 0
     net = Net(numFeatures,numAssets,timePeriod).to('cuda')
