@@ -23,7 +23,7 @@ def sharpe_loss(weights, batch_pos, batch_len, returns, TIME_PERIOD_LENGTH):
   er2 = er2/batch_len
   ratio = er / torch.std(er_list)
   ratio = -1 * ratio
-  print(ratio)
+  #print(ratio)
   return ratio
   
   

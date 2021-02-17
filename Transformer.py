@@ -23,7 +23,7 @@ def getBatch(normed,source,i):
     #print(data)
     data = data.reshape(data.shape[0],1,data.shape[1])
     #print(data)
-    periodClose = source[j+2*bptt-1,0::14]
+    periodClose = source[j+(2*bptt-1),0::14]
     periodOpen = source[j+bptt,0::14]
     returns = (periodClose/periodOpen) - 1
     rs.append(returns)
@@ -72,19 +72,16 @@ class TransformerModel(nn.Module):
 
   def forward(self, src, mask):
     src = self.pos_encoder(src)
-    print(mask.shape)
     output = self.transformer_encoder(src,mask)
-    #print(output.shape)
     output = output.reshape((output.shape[1],output.shape[0]*self.ninp))
     output = self.decoder(output)
-    print(output.shape)
     return self.sm(output)
 
 def normalize(X):
-  mins = torch.min(X,1).values
-  maxs = torch.max(X,1).values
-  mins = mins.reshape(-1,1)
-  maxs = maxs.reshape(-1,1)
+  mins = torch.min(X,0).values
+  maxs = torch.max(X,0).values
+  mins = mins.reshape(1,-1)
+  maxs = maxs.reshape(1,-1)
   normed = (X-mins)/(maxs-mins)
   return normed
    
@@ -105,8 +102,10 @@ model = TransformerModel(nAssets,nFeats,nHead,nHid,nLayers,dropout)
 model = model.double()
 
 crit = sharpe_loss
-optimizer = optim.Adam(model.parameters(), lr=1e-5, weight_decay = 0)
-epochs = 1000 
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
+epochs = 50 
+
+getBatch(port.featurized,source,1246)
 
 X = torch.rand((5,2,56))
 m = torch.rand((5,5))
@@ -114,21 +113,24 @@ m = torch.rand((5,5))
 def train():
   model.train()
   mask = model.generate_square_subsequent_mask(bptt)
-  for i in range(0,len(port.featurized),bptt+1):
-    losses = []
+  losses = []
+  for i in range(0,len(port.featurized)-(2*bptt-1)-1,bptt+1):
     data,rts = getBatch(port.featurized,source,i)
+    if i % 100 == 0:
+      print(i)
     for e in range(epochs):
       optimizer.zero_grad()
       if data.size(0) != bptt:
         mask = model.generate_square_subsequent_mask(data.size(0))
       out = model(data.double(),mask)
-      print(out,rts)
+      #print(out,rts)
       loss = crit(out,0,out.size(0),rts,bptt)
-      #torch.nn.utils.clip_grad_norm_(model.parameters(),0.5)
-      losses.append(loss.item())
+      torch.nn.utils.clip_grad_norm_(model.parameters(),0.5)
+      if e == epochs-1:
+        losses.append(loss.item())
       loss.backward()
       optimizer.step()
-    plt.plot(losses)
-    plt.show()
+  plt.plot(losses)
+  plt.show()
 
 train()
