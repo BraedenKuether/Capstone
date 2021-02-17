@@ -23,17 +23,16 @@ def sharpe_loss(weights, batch_pos, batch_len, returns, TIME_PERIOD_LENGTH):
   er2 = er2/batch_len
   ratio = er / torch.std(er_list)
   ratio = -1 * ratio
-  #print(ratio)
   return ratio
   
   
-def train_net(d,timePeriod,numAssets,numFeatures,batchSize):
+def train_net(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
   #print(d)
   overall_val = 1
   start_day = 0
   net = Net(numFeatures,numAssets,timePeriod).to('cuda')
   losses_new_net = []
-  num_epochs = 100
+  num_epochs = epochs
   optimizer = optim.Adam(net.parameters(), lr=1e-5, weight_decay = 0)
   loss_fn = sharpe_loss
   total_time = 0
@@ -71,7 +70,7 @@ def train_net(d,timePeriod,numAssets,numFeatures,batchSize):
       simulation_day = 0
 
   print(overall_val)
-  return weights,net
+  return weights,net,losses_new_net
 
 def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   overall_val = 1
@@ -128,13 +127,13 @@ def validation_set_earnings(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
       simulation_day = 0
   return x,y
 
-def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize):
+def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
   #print(d)
   overall_val = 1
   start_day = 0
   net = NetWithEarnings(numFeatures,d.NUM_EARNINGS_FEATURES,numAssets,timePeriod).to('cuda')
   losses_new_net = []
-  num_epochs = 100
+  num_epochs = epochs
   optimizer = optim.Adam(net.parameters(), lr=1e-5, weight_decay = 0)
   loss_fn = sharpe_loss
   total_time = 0
@@ -142,7 +141,7 @@ def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize):
   weights = []
   for i in range(len(d)):
     start = time.time()
-    print("step {}".format(i))
+    #("step {}".format(i))
     for epoch in range(num_epochs):
       out = net.forward(d[i], d.earnings[i], len(d[i]))
 
@@ -155,7 +154,7 @@ def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize):
           percent_change = torch.dot(d.future_returns(future_index)[0], weights)
           overall_val *= 1 + percent_change
           print("return:",overall_val)
-          print("allocs: ",weights)
+          #print("allocs: ",weights)
       
       loss = loss_fn(out, i, len(d[i]), d.future_returns(i), timePeriod)
       losses_new_net.append(loss.item())
@@ -166,10 +165,10 @@ def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize):
 
     total_time += time.time() - start
     avg_time = total_time/(i + 1)
-    print("eta: {}m {}s".format(int(avg_time/60 * (len(d) - i - 1)), int((avg_time *(len(d) - i - 1)) % 60 )))
+    #print("eta: {}m {}s".format(int(avg_time/60 * (len(d) - i - 1)), int((avg_time *(len(d) - i - 1)) % 60 )))
     simulation_day += len(d[i])
     if simulation_day >= timePeriod:
       simulation_day = 0
 
   print(overall_val)
-  return weights,net
+  return weights,net,losses_new_net

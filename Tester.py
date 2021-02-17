@@ -20,8 +20,8 @@ class Tester:
     self.time = timePeriod
     self.batch = batchSize
     self.numFeats = p.featurized.shape[1]
-    print(self.numFeats)
-    if train_func == train_net_earnings:
+    print("train_func:", train_func)
+    if self.train_func == train_net_earnings:
       self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features)
     else:
       self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize)
@@ -76,9 +76,17 @@ class Tester:
 
     return (var,std)
 
-  def trainModel(self):
-    w, net = self.train_func(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+  def trainModel(self, epochs = 100):
+    w, net,losses = self.train_func(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch,epochs)
     self.net = net
+    self.losses = losses
+    self.epochs = epochs
+    
+  def plotLosses(self):
+    for i in range(int(len(self.losses)/self.epochs)):
+      x = [i for i in range(len(self.losses[i*self.epochs:(i+1)*self.epochs]))]
+      plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
+      plt.show()
   
   def testingSet(self):
     #w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
@@ -219,26 +227,30 @@ class Tester:
     plot.set_title("Daily "+key)
     plt.show()
 
-    
+
+'''    
 stonks = ['aapl', 'msft', 'fb', 'goog']
-p = p.Portfolio(stonks,client)
-
-ts = Tester(p,5,2)
-
-print(ts.topbottom([.25,.25,.25,.25]))
-#stonks = ['vti', 'agg', 'dbc', 'vixy']
-stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
 p = P.Portfolio(stonks,client)
 
 ts = Tester(p,5,2)
 
+print(ts.topbottom([.25,.25,.25,.25]))
+'''
+#stonks = ['vti', 'agg', 'dbc', 'vixy']
+stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
+
+'''
+p = P.Portfolio(stonks,client)
+ts = Tester(p,5,2)
 ts.plotPortfolio()
 ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
+'''
 
 p = P.Portfolio(stonks,client,earnings=True)
 ts = Tester(p,5,2,train_func = train_net_earnings)
 ts.plotPortfolio()
 ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
+ts.plotLosses()
 '''
 r = ts.cumulativeReturns([.25,.25,.25,.25])
 r = r.dropna(0,'any')
