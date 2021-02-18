@@ -77,7 +77,6 @@ def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   simulation_day = 0
   x = [testing_d.dates[0][0][0][0]]
   y = [1]
-  print(testing_d.dates[0])
   for i in range(len(testing_d)):
     with torch.no_grad():
       if simulation_day == 0:
@@ -91,7 +90,7 @@ def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
         percent_change = torch.dot(returns, weights)
         overall_val *= (1 + percent_change)
         print(overall_val)
-        x.append(testing_d.dates[0][i][0][0])
+        x.append(testing_d.dates[i][0][0][0])
         y.append(overall_val.item())
       
     simulation_day += len(testing_d[i])
@@ -119,7 +118,8 @@ def validation_set_earnings(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
         percent_change = torch.dot(returns, weights)
         overall_val *= (1 + percent_change)
         print(overall_val)
-        x.append(testing_d.dates[0][i][0][0])
+        print(len(testing_d.dates),len(testing_d.dates[0]))
+        x.append(testing_d.dates[i][0][0][0])
         y.append(overall_val.item())
       
     simulation_day += len(testing_d[i])
