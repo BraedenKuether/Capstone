@@ -15,7 +15,7 @@ class Net(nn.Module):
         x, (hn, cn) = self.input(x)
         x = x.reshape((batch_len, self.time* 64))
         x = self.lin(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.soft_out(x)
         return x
 

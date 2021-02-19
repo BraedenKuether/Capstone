@@ -247,7 +247,7 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
 p = P.Portfolio(stonks,client,earnings=True)
-ts = Tester(p,5,2,train_func = train_net_earnings)
+ts = Tester(p,5,10,train_func = train_net)
 ts.plotPortfolio()
 ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 ts.plotLosses()

@@ -3,6 +3,12 @@ import torch
 from torch import optim
 import math
 import time
+import Dataset 
+import Portfolio as p 
+import pyEX as px
+import matplotlib.pyplot as plt
+client = px.Client(version="sandbox")
+
 
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
 def sharpe_loss(weights, batch_pos, batch_len, returns, TIME_PERIOD_LENGTH):
@@ -10,6 +16,7 @@ def sharpe_loss(weights, batch_pos, batch_len, returns, TIME_PERIOD_LENGTH):
   er = 0
   er2 = 0
   annual_risk_free_rate = 1.09
+  eps = .001
   daily_risk_free_rate = annual_risk_free_rate ** (1/365)
   er_list = []
   for batch in range(batch_len):
@@ -21,7 +28,7 @@ def sharpe_loss(weights, batch_pos, batch_len, returns, TIME_PERIOD_LENGTH):
   er_list = torch.Tensor(er_list)
   er = er/batch_len
   er2 = er2/batch_len
-  ratio = er / torch.std(er_list)
+  ratio = er / (torch.std(er_list) + eps) 
   ratio = -1 * ratio
   return ratio
   
@@ -31,7 +38,6 @@ def train_net(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
   overall_val = 1
   start_day = 0
   net = Net(numFeatures,numAssets,timePeriod).to('cuda')
-  losses_new_net = []
   num_epochs = epochs
   optimizer = optim.Adam(net.parameters(), lr=1e-5, weight_decay = 0)
   loss_fn = sharpe_loss
@@ -41,6 +47,7 @@ def train_net(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
   for i in range(len(d)):
     start = time.time()
     print("step {}".format(i))
+    losses_new_net = []
     for epoch in range(num_epochs):
       out = net.forward(d[i], len(d[i]))
 
@@ -61,13 +68,16 @@ def train_net(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
       optimizer.zero_grad()
       loss.backward()
       optimizer.step()
-
     total_time += time.time() - start
     avg_time = total_time/(i + 1)
     print("eta: {}m {}s".format(int(avg_time/60 * (len(d) - i - 1)), int((avg_time *(len(d) - i - 1)) % 60 )))
     simulation_day += len(d[i])
     if simulation_day >= timePeriod:
       simulation_day = 0
+      plt.plot(losses_new_net)
+      plt.show()
+
+
 
   print(overall_val)
   return weights,net,losses_new_net
@@ -172,3 +182,5 @@ def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
 
   print(overall_val)
   return weights,net,losses_new_net
+
+
