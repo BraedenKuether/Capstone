@@ -82,11 +82,13 @@ class Tester:
     self.losses = losses
     self.epochs = epochs
     
-  def plotLosses(self):
-    for i in range(int(len(self.losses)/self.epochs)):
-      x = [i for i in range(len(self.losses[i*self.epochs:(i+1)*self.epochs]))]
-      plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
-      plt.show()
+  def plotLosses(self, show_last_x = -1):
+    batches = int(len(self.losses)/self.epochs)
+    for i in range(batches):
+      if show_last_x != -1 and batches - i < show_last_x:
+          x = [i for i in range(len(self.losses[i*self.epochs:(i+1)*self.epochs]))]
+          plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
+          plt.show()
   
   def testingSet(self):
     #w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
@@ -249,8 +251,7 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 p = P.Portfolio(stonks,client,earnings=True)
 ts = Tester(p,5,10,train_func = train_net)
 ts.plotPortfolio()
-ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
-ts.plotLosses()
+ts.plotLosses(show_last_x = 10)
 '''
 r = ts.cumulativeReturns([.25,.25,.25,.25])
 r = r.dropna(0,'any')
