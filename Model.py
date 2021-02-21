@@ -7,16 +7,19 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.time = TIME_PERIOD_LENGTH
         self.input = nn.LSTM(NUM_FEATURES, 64, 1, batch_first = True)
-        self.lin = nn.Linear(self.time*64,NUM_ASSETS)
-        self.soft_out = nn.Softmax(dim=1)
+        self.lin = nn.Linear(64,NUM_ASSETS)
+        self.soft_out = nn.Softmax(dim=2)
 
     def forward(self, x, batch_len):
-        # x : batch_len X self.time X (NUM_ASSETS*TIME_PERIOD_LENGTH)
+        # x : batch_len X self.time X NUM_FEATURES
         x, (hn, cn) = self.input(x)
-        x = x.reshape((batch_len, self.time* 64))
+        # batch X time x assets*time
+        print(x.shape)
         x = self.lin(x)
-        #print(x.shape)
+        print(x.shape)
         x = self.soft_out(x)
+        print(x.shape)
+        print(x)
         return x
 
 class NetWithEarnings(nn.Module):

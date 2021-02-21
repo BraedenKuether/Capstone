@@ -77,7 +77,7 @@ class Tester:
     return (var,std)
 
   def trainModel(self, epochs = 100):
-    w, net,losses = self.train_func(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch,epochs)
+    w, net,losses = self.train_func(self.dataset,self.portfolio.pctChange,self.time,self.portfolio.numAssets,self.numFeats,self.batch,epochs)
     self.net = net
     self.losses = losses
     self.epochs = epochs
@@ -249,7 +249,7 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
 p = P.Portfolio(stonks,client,earnings=True)
-ts = Tester(p,5,10,train_func = train_net)
+ts = Tester(p,5,2,train_func = train_net)
 ts.plotPortfolio()
 ts.plotLosses(show_last_x = 10)
 '''

@@ -7,33 +7,24 @@ import Dataset
 import Portfolio as p 
 import pyEX as px
 import matplotlib.pyplot as plt
+import numpy as np
 client = px.Client(version="sandbox")
 
 
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
-def sharpe_loss(weights, batch_pos, batch_len, returns, TIME_PERIOD_LENGTH):
-  total_ratio = 0
-  er = 0
-  er2 = 0
-  annual_risk_free_rate = 1.09
-  eps = .001
-  daily_risk_free_rate = annual_risk_free_rate ** (1/365)
-  er_list = []
-  for batch in range(batch_len):
-    r_i_t = returns[batch]
-    curr_er = torch.dot(r_i_t, weights[batch])
-    er += (curr_er - daily_risk_free_rate**TIME_PERIOD_LENGTH)
-    er2 += curr_er**2
-    er_list.append(curr_er)
-  er_list = torch.Tensor(er_list)
-  er = er/batch_len
-  er2 = er2/batch_len
-  ratio = er / (torch.std(er_list) + eps) 
-  ratio = -1 * ratio
-  return ratio
+def sharpe_loss(weights, returns):
+  # weights batch * time * assets
+  # returns batch * time * assets
+
+  #row wise dot product
+  R = torch.sum(weights*returns,dim=-1)
+  ER = torch.mean(R,1)
+  STD = torch.std(R,1)
+  ratio = torch.sum(ER/STD) 
+  return -ratio
   
   
-def train_net(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
+def train_net(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
   #print(d)
   overall_val = 1
   start_day = 0
@@ -56,13 +47,18 @@ def train_net(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
         with torch.no_grad():
           future_index = math.ceil(i + (timePeriod/batchSize))
           sim_out = net.forward(d[future_index], len(d[future_index]))
-          weights = sim_out[0].view(numAssets)
+          weights = sim_out[0][-1].view(numAssets)
           percent_change = torch.dot(d.future_returns(future_index)[0], weights)
           overall_val *= 1 + percent_change
           print("return:",overall_val)
           print("allocs: ",weights)
       
-      loss = loss_fn(out, i, len(d[i]), d.future_returns(i), timePeriod)
+      
+      b = [] 
+      for t in range(out.shape[0]):
+        b.append(torch.unsqueeze(returns[t:t+timePeriod],0))
+      b = torch.cat(b)
+      loss = loss_fn(out,b)
       losses_new_net.append(loss.item())
       
       optimizer.zero_grad()

@@ -11,6 +11,7 @@ class Portfolio:
     self.assetsByTime = []
     self.numAssets = len(assets)
     self.client = client
+    self.pctChange = None 
     if earnings:
       self.earnings_dfs = []
       earnings_feats = ['accountsPayable', 'commonStock', 'currentAssets', 'currentCash', 'currentLongTermDebt', 'inventory', 
@@ -34,6 +35,7 @@ class Portfolio:
       if earnings:
         data = data.loc[min_date:]
       data["returns"] = data["close"].values-data["open"].values
+      
       m = min(m,len(data))
       tmp.append(data)
     for a in tmp:
@@ -43,7 +45,17 @@ class Portfolio:
 
     for a in self.assetsByTime:
       print(len(a)) 
-    
+
+    change = []
+    for a in self.assetsByTime:
+      print(a['close'])
+      x = a['close'].pct_change().values
+      x = torch.tensor(x).reshape(-1,1)
+      change.append(x)
+    for x in change:
+      x[0][0] = 1
+    self.pctChange = torch.cat(change,1) 
+    print(self.pctChange.shape) 
     self.featurized,self.dates = self.featurize(self.assetsByTime)
        
 
