@@ -35,25 +35,10 @@ def train_net(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
   total_time = 0
   simulation_day = 0
   weights = []
-  for i in range(len(d)):
-    start = time.time()
-    print("step {}".format(i))
+  for _ in range(epochs):
     losses_new_net = []
-    for epoch in range(num_epochs):
+    for i in range(len(d)):
       out = net.forward(d[i], len(d[i]))
-
-      future_index = math.ceil(i + (timePeriod/batchSize))
-      if epoch == 0 and simulation_day == 0 and future_index < len(d):
-        with torch.no_grad():
-          future_index = math.ceil(i + (timePeriod/batchSize))
-          sim_out = net.forward(d[future_index], len(d[future_index]))
-          weights = sim_out[0][-1].view(numAssets)
-          percent_change = torch.dot(d.future_returns(future_index)[0], weights)
-          overall_val *= 1 + percent_change
-          print("return:",overall_val)
-          print("allocs: ",weights)
-      
-      
       b = [] 
       for t in range(out.shape[0]):
         b.append(torch.unsqueeze(returns[t:t+timePeriod],0))
@@ -64,18 +49,8 @@ def train_net(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
       optimizer.zero_grad()
       loss.backward()
       optimizer.step()
-    total_time += time.time() - start
-    avg_time = total_time/(i + 1)
-    print("eta: {}m {}s".format(int(avg_time/60 * (len(d) - i - 1)), int((avg_time *(len(d) - i - 1)) % 60 )))
-    simulation_day += len(d[i])
-    if simulation_day >= timePeriod:
-      simulation_day = 0
-      plt.plot(losses_new_net)
-      plt.show()
-
-
-
-  print(overall_val)
+    plt.plot(losses_new_net)
+    plt.show()
   return weights,net,losses_new_net
 
 def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):

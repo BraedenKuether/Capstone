@@ -76,8 +76,6 @@ class PortfolioDataSet(Dataset):
     self.returns = torch.split(torch.Tensor(self.returns),BATCH_SIZE)
     self.future_day_prices = torch.split(torch.Tensor(self.future_day_prices),BATCH_SIZE)
     self.current_day_prices = torch.split(torch.Tensor(self.current_day_prices),BATCH_SIZE)
-    self.dates = np.split(np.array(self.dates),BATCH_SIZE)
-    self.dates = np.array(self.dates)
     self.dates = [self.dates[i:i+BATCH_SIZE] for i in range(0,len(self.dates),BATCH_SIZE)]
     if earnings:
       self.earnings = torch.split(torch.Tensor(self.earnings),BATCH_SIZE)
