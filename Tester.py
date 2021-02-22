@@ -89,6 +89,19 @@ class Tester:
           x = [i for i in range(len(self.losses[i*self.epochs:(i+1)*self.epochs]))]
           plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
           plt.show()
+          
+  def plotValidationLosses(self, show_last_x = -1):
+    batches = int(len(self.valid_losses)/self.epochs)
+    if show_last_x != -1:
+      y = self.valid_losses[-1*show_last_x:]
+    else:
+      y = self.valid_losses
+    x = self.valid_dates[-1*len(y):]
+    plt.plot(x,y)
+    ticks = [x[i] for i in range(0, len(x), 4)]
+    plt.xticks(ticks, rotation=45)
+    plt.show()
+        
   
   def testingSet(self):
     #w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
@@ -97,7 +110,9 @@ class Tester:
     #w = w.cpu()
     #self.cumulativeReturns(w,slice(split,None))
     if self.train_func == train_net_earnings:
-      x,y = validation_set_earnings(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
+      x,y,losses,dates = validation_set_earnings(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates
     else:
       x,y = validation_set(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
     self.validation_returns(x,y)
@@ -249,9 +264,10 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
 p = P.Portfolio(stonks,client,earnings=True)
-ts = Tester(p,5,64,train_func = train_net)
+ts = Tester(p,5,64,train_func = train_net_earnings)
 ts.plotPortfolio()
 ts.plotLosses(show_last_x = 10)
+ts.plotValidationLosses()
 '''
 r = ts.cumulativeReturns([.25,.25,.25,.25])
 r = r.dropna(0,'any')

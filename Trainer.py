@@ -8,13 +8,18 @@ import Portfolio as p
 import pyEX as px
 import matplotlib.pyplot as plt
 import numpy as np
-client = px.Client(version="sandbox")
+import json
+
+with open('token.json', 'r') as file:
+    token = json.loads(file.read())['sandbox']
+client = px.Client(token,version="sandbox")
 
 
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
 def sharpe_loss(weights, returns):
   # weights batch * time * assets
   # returns batch * time * assets
+  #print(weights.shape, returns.shape)
 
   #row wise dot product
   R = torch.sum(weights*returns,dim=-1)
@@ -65,13 +70,13 @@ def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
         out = net.forward(testing_d[i], len(testing_d[i]))
         #print(out)
         returns = testing_d.future_returns(i)[0]
-        weights = out[0].view(NUM_ASSETS)
+        weights = out[-1][-1].view(NUM_ASSETS)
         print("weights:", weights)
-        print("current:", testing_d.current_day_prices[i][0], "future:", testing_d.future_day_prices[i][0], "calculated change:", returns)
+        print("current:", testing_d.current_day_prices[i][-1][-1], "future:", testing_d.future_day_prices[i][-1][-1], "calculated change:", returns)
         percent_change = torch.dot(returns, weights)
         overall_val *= (1 + percent_change)
         print(overall_val)
-        x.append(testing_d.dates[i][0][0][0])
+        x.append(testing_d.dates[i][-1][-1][0])
         y.append(overall_val.item())
       
     simulation_day += len(testing_d[i])
@@ -81,10 +86,13 @@ def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   return x,y
   
 def validation_set_earnings(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
+  loss_fn = sharpe_loss
   overall_val = 1
   simulation_day = 0
   x = [testing_d.dates[0][0][0][0]]
   y = [1]
+  losses = []
+  losses_dates = []
   print(testing_d.dates[0])
   for i in range(len(testing_d)):
     with torch.no_grad():
@@ -92,23 +100,25 @@ def validation_set_earnings(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
         #print("input:", testing_d[i])
         out = net.forward(testing_d[i], testing_d.earnings[i], len(testing_d[i]))
         #print(out)
-        returns = testing_d.future_returns(i)[0]
-        weights = out[0].view(NUM_ASSETS)
+        returns = testing_d.future_returns(i)[-1][-1]
+        weights = out[-1][-1].view(NUM_ASSETS)
         print("weights:", weights)
-        print("current:", testing_d.current_day_prices[i][0], "future:", testing_d.future_day_prices[i][0], "calculated change:", returns)
+        print("current:", testing_d.current_day_prices[i][-1][-1], "future:", testing_d.future_day_prices[i][-1][-1], "calculated change:", returns, "day:", testing_d.dates[i][-1][-1][0])
         percent_change = torch.dot(returns, weights)
         overall_val *= (1 + percent_change)
         print(overall_val)
         print(len(testing_d.dates),len(testing_d.dates[0]))
-        x.append(testing_d.dates[i][0][0][0])
+        x.append(testing_d.dates[i][-1][-1][0])
         y.append(overall_val.item())
+      losses.append(loss_fn(out, testing_d.future_returns(i)))
+      losses_dates.append(testing_d.dates[i][-1][-1][0])
       
     simulation_day += len(testing_d[i])
     if simulation_day >= TIME_PERIOD_LENGTH:
       simulation_day = 0
-  return x,y
+  return x,y,losses,losses_dates
 
-def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
+def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
   #print(d)
   overall_val = 1
   start_day = 0
@@ -127,6 +137,7 @@ def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
       out = net.forward(d[i], d.earnings[i], len(d[i]))
 
       future_index = math.ceil(i + (timePeriod/batchSize))
+      '''
       if epoch == 0 and simulation_day == 0 and future_index < len(d):
         with torch.no_grad():
           future_index = math.ceil(i + (timePeriod/batchSize))
@@ -136,8 +147,9 @@ def train_net_earnings(d,timePeriod,numAssets,numFeatures,batchSize,epochs):
           overall_val *= 1 + percent_change
           print("return:",overall_val)
           #print("allocs: ",weights)
-      
-      loss = loss_fn(out, i, len(d[i]), d.future_returns(i), timePeriod)
+      '''
+      #loss = loss_fn(out, i, len(d[i]), d.future_returns(i), timePeriod)
+      loss = loss_fn(out, d.future_returns(i))
       losses_new_net.append(loss.item())
       
       optimizer.zero_grad()

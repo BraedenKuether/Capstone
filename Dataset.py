@@ -36,18 +36,20 @@ class PortfolioDataSet(Dataset):
     scaler = MinMaxScaler()
     i = 0
     print("len raw:",len(self.raw))
-    while i + 2*self.window - 1 < len(self.raw):
+    while i + 2*self.window < len(self.raw):
       select = self.raw[i:i+self.window].tolist() # get a TIME_PERIOD_LENGTH chunk
-      future_day_prices = self.raw[i + 2*self.window - 1].view((self.n,int(self.features/self.n)))[:,0] # get day close 
-      last_day_prices = self.raw[i + self.window - 1].view((self.n,int(self.features/self.n)))[:,0]
-      future_returns = future_day_prices/last_day_prices - 1
+      #for each day, gets the percent change time_period_length days in the future
+      #print(self.features, self.n)
+      future_day_prices = [[day[j] for j in range(0, self.features, int(self.features/self.n))] for day in self.raw[i + self.window : i + 2*self.window]] # get day close 
+      last_day_prices = [[day[j] for j in range(0, self.features, int(self.features/self.n))] for day in self.raw[i : i + self.window]]
+      future_returns = torch.tensor(future_day_prices)/torch.tensor(last_day_prices) - 1
       scaler.fit(select)
       normalized = scaler.transform(select)
       self.non_normal_data.append(select)
       self.data.append(normalized)
       self.returns.append(future_returns.tolist())
-      self.current_day_prices.append(last_day_prices.tolist())
-      self.future_day_prices.append(future_day_prices.tolist())
+      self.current_day_prices.append(last_day_prices)
+      self.future_day_prices.append(future_day_prices)
       self.dates.append(dates[i:i+self.window].tolist())
       if earnings:
         last_date = datetime.datetime.strptime(dates[i + self.window - 1][0], '%Y-%m-%d')
