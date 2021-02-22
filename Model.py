@@ -33,7 +33,7 @@ class NetWithEarnings(nn.Module):
     self.earnings_lin1 = nn.Linear(NUM_EARNING_FEATURES, NUM_EARNING_FEATURES)
     self.earnings_lin2 = nn.Linear(NUM_EARNING_FEATURES, NUM_ASSETS*TIME_PERIOD_LENGTH)
     self.final_lin = nn.Linear(NUM_ASSETS*2, NUM_ASSETS)
-    self.soft_out = nn.Softmax(dim=1)
+    self.soft_out = nn.Softmax(dim=2)
   def forward(self, x, earnings, batch_len):
     #print("input:",x,earnings)
     x, (h0, c0) = self.input(x)
