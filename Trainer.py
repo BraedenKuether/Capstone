@@ -125,15 +125,16 @@ def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epoc
   net = NetWithEarnings(numFeatures,d.NUM_EARNINGS_FEATURES,numAssets,timePeriod).to('cuda')
   losses_new_net = []
   num_epochs = epochs
-  optimizer = optim.Adam(net.parameters(), lr=1e-5, weight_decay = 0)
+  optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
   loss_fn = sharpe_loss
   total_time = 0
   simulation_day = 0
   weights = []
-  for i in range(len(d)):
+  for epoch in range(num_epochs):
     start = time.time()
+    epoch_losses = []
     #("step {}".format(i))
-    for epoch in range(num_epochs):
+    for i in range(len(d)):
       out = net.forward(d[i], d.earnings[i], len(d[i]))
 
       future_index = math.ceil(i + (timePeriod/batchSize))
@@ -150,11 +151,12 @@ def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epoc
       '''
       #loss = loss_fn(out, i, len(d[i]), d.future_returns(i), timePeriod)
       loss = loss_fn(out, d.future_returns(i))
-      losses_new_net.append(loss.item())
+      epoch_losses.append(loss.item())
       
       optimizer.zero_grad()
       loss.backward()
       optimizer.step()
+    losses_new_net.append(sum(epoch_losses))
 
     total_time += time.time() - start
     avg_time = total_time/(i + 1)
@@ -163,7 +165,7 @@ def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epoc
     if simulation_day >= timePeriod:
       simulation_day = 0
 
-  print(overall_val)
+  #print(overall_val)
   return weights,net,losses_new_net
 
 
