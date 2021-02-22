@@ -41,11 +41,10 @@ class Portfolio:
     for a in tmp:
       self.assetsByTime.append(a[:m])
     
-    #print("assets by time",self.assetsByTime)
 
     for a in self.assetsByTime:
       print(len(a)) 
-
+    
     change = []
     for a in self.assetsByTime:
       print(a['close'])
@@ -54,10 +53,9 @@ class Portfolio:
       change.append(x)
     for x in change:
       x[0][0] = 1
+     
     self.pctChange = torch.cat(change,1) 
-    print(self.pctChange.shape) 
     self.featurized,self.dates = self.featurize(self.assetsByTime)
-       
 
   def printAssets(self):
     print(self.assetsByTime[0][:10,0])
@@ -90,13 +88,5 @@ class Portfolio:
     dates = np.concatenate(FD,1)
     return catted,dates
  
-
   def batch(self):
-    pass             
-
-
-
-
-
-
-
+    pass
