@@ -9,7 +9,7 @@ import pyEX as px
 import matplotlib.pyplot as plt
 import numpy as np
 import json
-
+import sys
 with open('token.json', 'r') as file:
     token = json.loads(file.read())['sandbox']
 client = px.Client(token,version="sandbox")
@@ -25,37 +25,36 @@ def sharpe_loss(weights, returns):
   R = torch.sum(weights*returns,dim=-1)
   ER = torch.mean(R,1)
   STD = torch.std(R,1)
-  ratio = torch.sum(ER/STD) 
+  ratio = torch.sum(ER/(STD+1e-6)) 
   return -ratio
   
   
 def train_net(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
-  #print(d)
-  overall_val = 1
-  start_day = 0
   net = Net(numFeatures,numAssets,timePeriod).to('cuda')
   num_epochs = epochs
-  optimizer = optim.Adam(net.parameters(), lr=1e-5, weight_decay = 0)
+  optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
   loss_fn = sharpe_loss
-  total_time = 0
-  simulation_day = 0
+  lossVs = [] 
   weights = []
-  for _ in range(epochs):
-    losses_new_net = []
+  for e in range(epochs):
+    acc = 0.0
+    if  e % 10 == 0:
+      print(e)
     for i in range(len(d)):
+      optimizer.zero_grad()
+      print(d[i].shape)
       out = net.forward(d[i], len(d[i]))
       b = [] 
       for t in range(out.shape[0]):
         b.append(torch.unsqueeze(returns[t:t+timePeriod],0))
       b = torch.cat(b)
       loss = loss_fn(out,b)
-      losses_new_net.append(loss.item())
-      
-      optimizer.zero_grad()
+      acc += loss.item()
       loss.backward()
       optimizer.step()
-    plt.plot(losses_new_net)
-    plt.show()
+    lossVs.append(acc/len(d))
+  plt.plot(lossVs)
+  plt.show()
   return weights,net,losses_new_net
 
 def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
