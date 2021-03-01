@@ -27,6 +27,7 @@ class PortfolioDataSet(Dataset):
     self.future_day_prices = []
     self.current_day_prices = []
     self.dates = []
+    self.future_dates = []
     if earnings:
       self.NUM_EARNINGS_FEATURES = num_earning_feats
       for i in range(len(earnings)):
@@ -51,6 +52,7 @@ class PortfolioDataSet(Dataset):
       self.current_day_prices.append(last_day_prices)
       self.future_day_prices.append(future_day_prices)
       self.dates.append(dates[i:i+self.window].tolist())
+      self.future_dates.append(dates[i + self.window : i + 2*self.window].tolist())
       if earnings:
         last_date = datetime.datetime.strptime(dates[i + self.window - 1][0], '%Y-%m-%d')
         earnings_list = []
@@ -68,6 +70,7 @@ class PortfolioDataSet(Dataset):
       self.future_day_prices = self.future_day_prices[1:]
       self.current_day_prices = self.current_day_prices[1:]
       self.dates = self.dates[1:]
+      self.future_dates = self.future_dates[1:]
       if earnings:
         self.earnings = self.earnings[1:]
 
@@ -79,6 +82,7 @@ class PortfolioDataSet(Dataset):
     self.future_day_prices = torch.split(torch.Tensor(self.future_day_prices),BATCH_SIZE)
     self.current_day_prices = torch.split(torch.Tensor(self.current_day_prices),BATCH_SIZE)
     self.dates = [self.dates[i:i+BATCH_SIZE] for i in range(0,len(self.dates),BATCH_SIZE)]
+    self.future_dates = [self.future_dates[i:i+BATCH_SIZE] for i in range(0,len(self.future_dates),BATCH_SIZE)]
     if earnings:
       self.earnings = torch.split(torch.Tensor(self.earnings),BATCH_SIZE)
     

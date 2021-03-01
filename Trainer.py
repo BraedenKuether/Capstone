@@ -32,7 +32,7 @@ def sharpe_loss(weights, returns):
 def train_net(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
   net = Net(numFeatures,numAssets,timePeriod).to('cuda')
   num_epochs = epochs
-  optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
+  optimizer = optim.Adam(net.parameters(), lr=1e-7, weight_decay = 0)
   loss_fn = sharpe_loss
   lossVs = [] 
   weights = []
@@ -88,7 +88,7 @@ def validation_set_earnings(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   loss_fn = sharpe_loss
   overall_val = 1
   simulation_day = 0
-  x = [testing_d.dates[0][0][0][0]]
+  x = [testing_d.dates[0][-1][-1][0]]
   y = [1]
   losses = []
   losses_dates = []
@@ -107,7 +107,7 @@ def validation_set_earnings(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
         overall_val *= (1 + percent_change)
         print(overall_val)
         print(len(testing_d.dates),len(testing_d.dates[0]))
-        x.append(testing_d.dates[i][-1][-1][0])
+        x.append(testing_d.future_dates[i][-1][-1][0])
         y.append(overall_val.item())
       losses.append(loss_fn(out, testing_d.future_returns(i)))
       losses_dates.append(testing_d.dates[i][-1][-1][0])
@@ -150,12 +150,12 @@ def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epoc
       '''
       #loss = loss_fn(out, i, len(d[i]), d.future_returns(i), timePeriod)
       loss = loss_fn(out, d.future_returns(i))
-      epoch_losses.append(loss.item())
+      epoch_losses.append(loss.item()/len(d[i]))
       
       optimizer.zero_grad()
       loss.backward()
       optimizer.step()
-    losses_new_net.append(sum(epoch_losses))
+    losses_new_net.append(sum(epoch_losses)/num_epochs)
 
     total_time += time.time() - start
     avg_time = total_time/(i + 1)
