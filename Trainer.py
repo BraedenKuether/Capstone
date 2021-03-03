@@ -29,30 +29,26 @@ def sharpe_loss(weights, returns):
   return -ratio
   
   
-def train_net(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
-  net = Net(numFeatures,numAssets,timePeriod).to('cuda')
-  num_epochs = epochs
-  optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
+def train_net(net,batches,epochs):
+  net = net.double()
+  net = net.to('cuda')
+  optimizer = optim.Adam(net.parameters(), lr=1e-6)
   loss_fn = sharpe_loss
   lossVs = [] 
   weights = []
+  
   for e in range(epochs):
     acc = 0.0
-    if  e % 10 == 0:
+    if e % 10:
       print(e)
-    for i in range(len(d)):
+    for X,y in batches:
       optimizer.zero_grad()
-      print(d[i].shape)
-      out = net.forward(d[i], len(d[i]))
-      b = [] 
-      for t in range(out.shape[0]):
-        b.append(torch.unsqueeze(returns[t:t+timePeriod],0))
-      b = torch.cat(b)
-      loss = loss_fn(out,b)
+      out = net.forward(X)
+      loss = loss_fn(out,y)
       acc += loss.item()
       loss.backward()
       optimizer.step()
-    lossVs.append(acc/len(d))
+    lossVs.append(acc/len(batches))
   plt.plot(lossVs)
   plt.show()
   return weights,net,losses_new_net

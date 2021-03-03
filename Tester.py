@@ -7,7 +7,8 @@ import json
 
 import Portfolio as P
 import Dataset 
-import Model
+from DailyDataset import DailyDataset
+from Model import *
 from Trainer import *
 
 IEX_TOKEN = "Tpk_647cd93d6c5842d6978e55c6f79b0e1a"
@@ -24,9 +25,12 @@ class Tester:
     if self.train_func == train_net_earnings:
       self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features)
     else:
-      self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize)
+      self.dataset = DailyDataset(P.featurized,P.pctChange,self.batch,P.numAssets,self.numFeats,timePeriod)
+
+    self.net = Net(self.numFeats,P.numAssets,timePeriod) 
+
     self.trainModel()
-    self.testingSet()
+    #self.testingSet()
 
 
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
@@ -77,9 +81,9 @@ class Tester:
     return (var,std)
 
   def trainModel(self, epochs = 100):
-    print(self.dataset[0].shape)
-    w, net,losses = self.train_func(self.dataset,self.portfolio.pctChange,self.time,self.portfolio.numAssets,self.numFeats,self.batch,epochs)
-    self.net = net
+    train,val,test = self.dataset.split(.8,.9)
+    w, self.net, losses = self.train_func(self.net,train,epochs)
+    
     self.losses = losses
     self.epochs = epochs
     
