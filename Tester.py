@@ -30,7 +30,6 @@ class Tester:
     self.net = Net(self.numFeats,P.numAssets,timePeriod) 
 
     self.trainModel()
-    #self.testingSet()
 
 
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
@@ -86,6 +85,13 @@ class Tester:
     
     self.losses = losses
     self.epochs = epochs
+    if self.train_func == train_net_earnings:
+      x,y,losses,dates = validation_set_earnings(test,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates
+    else:
+      x,y = validation_set(test,self.net,self.portfolio.numAssets,self.time)
+    self.validation_returns(x,y)
     
   def plotLosses(self):
     #plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
@@ -104,20 +110,6 @@ class Tester:
     plt.xticks(ticks, rotation=45)
     plt.show()
         
-  
-  def testingSet(self):
-    #w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
-    #w,net = train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
-    #self.net = net
-    #w = w.cpu()
-    #self.cumulativeReturns(w,slice(split,None))
-    if self.train_func == train_net_earnings:
-      x,y,losses,dates = validation_set_earnings(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
-      self.valid_losses = losses
-      self.valid_dates = dates
-    else:
-      x,y = validation_set(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
-    self.validation_returns(x,y)
 
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
     closes = [x['close'][s] for x in self.portfolio.assetsByTime]
