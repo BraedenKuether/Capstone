@@ -256,7 +256,9 @@ ts = Tester(p,5,2)
 print(ts.topbottom([.25,.25,.25,.25]))
 '''
 #stonks = ['vti', 'agg', 'dbc', 'vixy']
-stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
+#stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
+#stonks = ['adbe', 'atvi', 'axon', 'blk', 'bx', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
+stonks = ['adbe', 'atvi', 'blk', 'aaxn', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
 
 '''
 p = P.Portfolio(stonks,client)
@@ -266,7 +268,7 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
 p = P.Portfolio(stonks,client,earnings=True)
-ts = Tester(p,5,10,train_func = train_net)
+ts = Tester(p,60,1,train_func = train_net_earnings)
 ts.plotPortfolio()
 ts.plotLosses()
 ts.plotValidationLosses()
