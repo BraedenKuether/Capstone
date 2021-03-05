@@ -88,5 +88,3 @@ class Portfolio:
     dates = np.concatenate(FD,1)
     return catted,dates
  
-  def batch(self):
-    pass

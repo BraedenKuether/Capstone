@@ -16,7 +16,7 @@ with open('token.json', 'r') as file:
 client = px.Client(token,version="sandbox")
 
 
-torch.set_default_tensor_type('torch.cuda.FloatTensor')
+torch.set_default_tensor_type('torch.FloatTensor')
 def sharpe_loss(weights, returns):
   # weights batch * time * assets
   # returns batch * time * assets
@@ -32,7 +32,7 @@ def sharpe_loss(weights, returns):
   
 def train_net(net,batches,epochs):
   net = net.double()
-  net = net.to('cuda')
+  net = net.to('cpu')
   optimizer = optim.Adam(net.parameters(), lr=1e-6)
   loss_fn = sharpe_loss
   lossVs = [] 
@@ -117,7 +117,7 @@ def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epoc
   #print(d)
   overall_val = 1
   start_day = 0
-  net = NetWithEarnings(numFeatures,d.NUM_EARNINGS_FEATURES,numAssets,timePeriod).to('cuda')
+  net = NetWithEarnings(numFeatures,d.NUM_EARNINGS_FEATURES,numAssets,timePeriod).to('cpu')
   losses_new_net = []
   num_epochs = epochs
   optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
