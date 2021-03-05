@@ -39,7 +39,7 @@ def train_net(net,batches,epochs):
   weights = []
   for e in range(epochs):
     acc = 0.0
-    if e % 10:
+    if e % 10 == 0:
       print(e)
     for X,y in batches:
       optimizer.zero_grad()
@@ -51,7 +51,7 @@ def train_net(net,batches,epochs):
     lossVs.append(acc/len(batches))
   plt.plot(lossVs)
   plt.show()
-  return weights,net,losses_new_net
+  return weights,net,lossVs
 
 def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   overall_val = 1
