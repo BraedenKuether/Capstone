@@ -25,6 +25,9 @@ class Tester:
     if self.train_func == train_net_earnings:
       self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features,test_length = test_length)
     else:
+      self.dataset = DailyDataset(P.featurized,P.pctChange,self.batch,P.numAssets,self.numFeats,timePeriod)
+    
+    self.net = Net(self.numFeats,P.numAssets,timePeriod)
     self.trainModel()
 
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
