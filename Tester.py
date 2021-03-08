@@ -25,7 +25,7 @@ class Tester:
     if self.train_func == train_net_earnings:
       self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features)
     else:
-      self.dataset = DailyDataset(P.featurized,P.pctChange,self.batch,P.numAssets,self.numFeats,timePeriod)
+      self.dataset = DailyDataset(P.featurized,P.assetsByTime,self.batch,P.numAssets,self.numFeats,timePeriod,forecast=True)
 
     self.net = Net(self.numFeats,P.numAssets,timePeriod) 
 
@@ -79,7 +79,7 @@ class Tester:
 
     return (var,std)
 
-  def trainModel(self, epochs = 100):
+  def trainModel(self, epochs = 50):
     train,val,test = self.dataset.split(.8,.9)
     w, self.net, losses = self.train_func(self.net,train,epochs)
     
@@ -260,7 +260,7 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
 p = P.Portfolio(stonks,client,earnings=True)
-ts = Tester(p,60,1,train_func = train_net_earnings)
+ts = Tester(p,60,20,train_func = train_net)
 ts.plotPortfolio()
 ts.plotLosses()
 ts.plotValidationLosses()
