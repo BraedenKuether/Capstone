@@ -14,7 +14,7 @@ IEX_TOKEN = "Tpk_647cd93d6c5842d6978e55c6f79b0e1a"
 client = px.Client(IEX_TOKEN, version="sandbox")
 
 class Tester:
-  def __init__(self,P,timePeriod,batchSize,train_func = train_net):
+  def __init__(self,P,timePeriod,batchSize,train_func = train_net, test_length = 126,epochs=100):
     self.train_func = train_func
     self.portfolio = P
     self.time = timePeriod
@@ -22,10 +22,10 @@ class Tester:
     self.numFeats = p.featurized.shape[1]
     print("train_func:", train_func)
     if self.train_func == train_net_earnings:
-      self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features)
+      self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features,test_length = test_length)
     else:
-      self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize)
-    self.trainModel()
+      self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,test_length = test_length)
+    self.trainModel(epochs=epochs)
     self.testingSet()
 
 
@@ -112,7 +112,9 @@ class Tester:
       self.valid_losses = losses
       self.valid_dates = dates
     else:
-      x,y = validation_set(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
+      x,y,losses,dates = validation_set(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates      
     self.validation_returns(x,y)
 
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
@@ -254,7 +256,7 @@ print(ts.topbottom([.25,.25,.25,.25]))
 #stonks = ['vti', 'agg', 'dbc', 'vixy']
 #stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
 #stonks = ['adbe', 'atvi', 'axon', 'blk', 'bx', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
-stonks = ['adbe', 'atvi', 'blk', 'aaxn', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
+stonks = ['adbe', 'atvi', 'blk', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
 
 '''
 p = P.Portfolio(stonks,client)
@@ -264,7 +266,7 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
 p = P.Portfolio(stonks,client,earnings=True)
-ts = Tester(p,60,1,train_func = train_net_earnings)
+ts = Tester(p,5,5,train_func = train_net_earnings,epochs=100)
 ts.plotPortfolio()
 ts.plotLosses()
 ts.plotValidationLosses()
