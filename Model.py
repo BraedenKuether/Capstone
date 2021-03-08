@@ -10,7 +10,7 @@ class Net(nn.Module):
         self.lin = nn.Linear(64,NUM_ASSETS)
         self.soft_out = nn.Softmax(dim=2)
 
-    def forward(self, x, batch_len):
+    def forward(self, x):
         # x : batch_len X self.time X NUM_FEATURES
         x, (hn, cn) = self.input(x)
         # batch X time x assets*time

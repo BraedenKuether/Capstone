@@ -10,12 +10,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 import sys
+
 with open('token.json', 'r') as file:
     token = json.loads(file.read())['sandbox']
 client = px.Client(token,version="sandbox")
 
 
-torch.set_default_tensor_type('torch.cuda.FloatTensor')
+torch.set_default_tensor_type('torch.FloatTensor')
 def sharpe_loss(weights, returns):
   # weights batch * time * assets
   # returns batch * time * assets
@@ -38,22 +39,15 @@ def train_net(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
   weights = []
   for e in range(epochs):
     acc = 0.0
-    if  e % 10 == 0:
+    if e % 10 == 0:
       print(e)
-    for i in range(len(d)):
+    for X,y in batches:
       optimizer.zero_grad()
-      #print(d[i].shape)
-      out = net.forward(d[i], len(d[i]))
-      b = [] 
-      for t in range(out.shape[0]):
-        b.append(torch.unsqueeze(returns[t:t+timePeriod],0))
-      b = torch.cat(b)
-      #loss = loss_fn(out,b)
-      loss = loss_fn(out,d.future_returns(i))
-      acc += loss.item()
+      out = net.forward(X)
+      loss = loss_fn(out,y)      acc += loss.item()
       loss.backward()
       optimizer.step()
-    lossVs.append(acc/len(d))
+    lossVs.append(acc/len(batches))
   return weights,net,lossVs
   
 def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
@@ -104,7 +98,7 @@ def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epoc
       simulation_day = 0
 
   #print(overall_val)
-  return weights,net,losses_new_net
+  return weights,net,lossVs
 
 
 def validation_set(testing_d,net,NUM_ASSETS,TIME_PERIOD_LENGTH):

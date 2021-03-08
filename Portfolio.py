@@ -53,8 +53,10 @@ class Portfolio:
       change.append(x)
     for x in change:
       x[0][0] = 1
-     
+      print(x[:10]) 
+    
     self.pctChange = torch.cat(change,1) 
+    
     self.featurized,self.dates = self.featurize(self.assetsByTime)
 
   def printAssets(self):
@@ -62,8 +64,6 @@ class Portfolio:
     print(self.featurized[:10,0])
 
   def stockDF(self,client, symb, timeframe='5y'):
-    #the time of data appears to be inconsistent
-    #may need to check this down the road
     return client.chartDF(symb,timeframe=timeframe)
   
   def featurize(self,assets):
@@ -88,5 +88,3 @@ class Portfolio:
     dates = np.concatenate(FD,1)
     return catted,dates
  
-  def batch(self):
-    pass

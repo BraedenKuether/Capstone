@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 import numpy as np
 import datetime
 import random
-torch.set_default_tensor_type('torch.cuda.FloatTensor')
+torch.set_default_tensor_type('torch.FloatTensor')
 
 class PortfolioDataSet(Dataset):
   # assumes 5 year history for all assets need to generalize eventually
@@ -78,6 +78,8 @@ class PortfolioDataSet(Dataset):
     #print(torch.Tensor(self.data).shape)
     self.non_normal_data = torch.split(torch.Tensor(self.non_normal_data),BATCH_SIZE)
     self.data = torch.split(torch.Tensor(self.data),BATCH_SIZE)
+    print(len(self.data))
+    print(self.data[1].shape)
     self.returns = torch.split(torch.Tensor(self.returns),BATCH_SIZE)
     self.future_day_prices = torch.split(torch.Tensor(self.future_day_prices),BATCH_SIZE)
     self.current_day_prices = torch.split(torch.Tensor(self.current_day_prices),BATCH_SIZE)

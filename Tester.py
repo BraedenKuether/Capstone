@@ -7,7 +7,8 @@ import json
 
 import Portfolio as P
 import Dataset 
-import Model
+from DailyDataset import DailyDataset
+from Model import *
 from Trainer import *
 
 IEX_TOKEN = "Tpk_647cd93d6c5842d6978e55c6f79b0e1a"
@@ -24,10 +25,7 @@ class Tester:
     if self.train_func == train_net_earnings:
       self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features,test_length = test_length)
     else:
-      self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,test_length = test_length)
-    self.trainModel(epochs=epochs)
-    self.testingSet()
-
+    self.trainModel()
 
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
     closes = [x['close'][s] for x in self.portfolio.assetsByTime]
@@ -77,11 +75,18 @@ class Tester:
     return (var,std)
 
   def trainModel(self, epochs = 100):
-    print(self.dataset[0].shape)
-    w, net,losses = self.train_func(self.dataset,self.portfolio.pctChange,self.time,self.portfolio.numAssets,self.numFeats,self.batch,epochs)
-    self.net = net
+    train,val,test = self.dataset.split(.8,.9)
+    w, self.net, losses = self.train_func(self.net,train,epochs)
+    
     self.losses = losses
     self.epochs = epochs
+    if self.train_func == train_net_earnings:
+      x,y,losses,dates = validation_set_earnings(test,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates
+    else:
+      x,y = validation_set(test,self.net,self.portfolio.numAssets,self.time)
+    self.validation_returns(x,y)
     
   def plotLosses(self):
     #plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
@@ -266,8 +271,7 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
 p = P.Portfolio(stonks,client,earnings=True)
-ts = Tester(p,5,5,train_func = train_net_earnings,epochs=100)
-ts.plotPortfolio()
+ts = Tester(p,60,1,train_func = train_net_earnings)ts.plotPortfolio()
 ts.plotLosses()
 ts.plotValidationLosses()
 '''

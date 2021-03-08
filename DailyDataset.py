@@ -20,7 +20,19 @@ class DailyDataset:
     self.forecast = forecast
     self.bSize = bSize
     self.X,self.y = self.makeBatch(features) 
+
+  
+  def split(self,train,val):
+    trainL = int(len(self.X)*train) 
+    valL = int(len(self.X)*val)
     
+    z = list(zip(self.X,self.y))
+
+    train = z[:trainL] 
+    val = z[trainL:valL]
+    test = z[valL:]
+
+    return train,val,test
 
   def makeBatch(self,d):
     xs = []
@@ -56,4 +68,11 @@ class DailyDataset:
 
   def __len__(self):
     return len(self.X)
-    
+  
+  def __getitem__(self,i):
+    X,y = self.X[i],self.y[i]
+
+    if self.transformer:
+      X = torch.transpose(X,0,1)
+
+    return X,y 
