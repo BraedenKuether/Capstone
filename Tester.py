@@ -1,6 +1,7 @@
 import pyEX as px
 from Errors import *
 import pandas as pd
+from Grapher import *
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
@@ -37,7 +38,7 @@ class Tester:
       self.dataset = DailyDataset(P.featurized,P.assetsByTime,self.batch,P.numAssets,self.numFeats,timePeriod,forecast=True,dates = P.dates)
       self.net = Net(self.numFeats,P.numAssets,timePeriod)
     
-    self.trainModel(epochs=epochs)
+    #self.trainModel(epochs=epochs)
 
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
     closes = [x['close'][s] for x in self.portfolio.assetsByTime]
@@ -48,7 +49,15 @@ class Tester:
     if withPlot:
       returns['pdr'].plot(title="Cumulative Returns")
       plt.show()
-    return returns
+    
+    returns = returns.dropna(0,'any')
+    xs = returns['pdr'].index.strftime("%Y-%m-%d").values
+    ys = returns['pdr'].values
+    points = zip(xs,ys)
+
+    dataDict = {"Cumulative Returns":points} 
+
+    return toLine(dataDict) 
        
 
   def topbottom(self,weights):
@@ -62,7 +71,7 @@ class Tester:
     return (changes.dot(weights)) + 1,top,bottom 
 
   def performance(self,weights,timePeriod="ytd"):
-    ytds = [client.chartDF(symbol=s,timeframe=timePeriod).sort_index()['close'] for s in self.portfolio.symbols]
+    ytds = [s['close'] for s in self.portfolio.assetsByTime]
     changes = map(lambda stock: (stock.iloc[-1]-stock.iloc[0])/stock.iloc[0], ytds)
     changes = np.array(list(changes))
     top = max(changes)
@@ -86,76 +95,6 @@ class Tester:
 
     return (var,std)
 
-  def trainModel(self, epochs = 50):
-    train,val,test = self.dataset.split(.8,.9)
-    w, self.net, losses = self.train_func(self.net,train,epochs)
-    
-    self.losses = losses
-    self.epochs = epochs
-    if self.train_func == train_net_earnings:
-      x,y,losses,dates = validation_set_earnings(test,self.net,self.portfolio.numAssets,self.time)
-      self.valid_losses = losses
-      self.valid_dates = dates
-    else:
-      x,y,losses,dates = validation_set(test,self.net,self.portfolio.numAssets,self.time)
-      self.valid_losses = losses
-      self.valid_dates = dates
-      
-    self.validation_returns(x,y)
-
-  def plotLosses(self):
-    #plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
-    plt.plot(self.losses)
-    plt.show()
-          
-  def plotValidationLosses(self, show_last_x = -1):
-    batches = int(len(self.valid_losses)/self.epochs)
-    if show_last_x != -1:
-      y = self.valid_losses[-1*show_last_x:]
-    else:
-      y = self.valid_losses
-    x = self.valid_dates[-1*len(y):]
-    plt.plot(x,y)
-    ticks = [x[i] for i in range(0, len(x), 4)]
-    plt.xticks(ticks, rotation=45)
-    plt.show()
-        
-  
-  def testingSet(self):
-    #w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
-    #w,net = train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
-    #self.net = net
-    #w = w.cpu()
-    #self.cumulativeReturns(w,slice(split,None))
-    if self.train_func == train_net_earnings:
-      x,y,losses,dates = validation_set_earnings(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
-      self.valid_losses = losses
-      self.valid_dates = dates
-    else:
-      x,y,losses,dates = validation_set(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
-      self.valid_losses = losses
-      self.valid_dates = dates      
-    self.validation_returns(x,y)
-
-  def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
-    closes = [x['close'][s] for x in self.portfolio.assetsByTime]
-    catted = pd.concat(closes,axis=1)
-    returns = catted.pct_change()
-    returns['pdr'] = returns.dot(weights)
-    returns = (1+returns).cumprod() 
-    if withPlot:
-      returns['pdr'].plot(title="Cumulative Returns")
-      plt.show()
-    return returns
-      
-  def validation_returns(self,x,y):
-    plt.plot(x,y)
-    plt.xticks(x, rotation=45)
-    plt.margins(0.2)
-    plt.subplots_adjust(bottom=0.15)
-    plt.show()
-          
-    
   def risk(self,weights):
     closes = [x['close'] for x in self.portfolio.assetsByTime]
     catted = pd.concat(closes,axis=1)
@@ -256,14 +195,80 @@ class Tester:
 
   def plotPortfolio(self,key="close"):
     plot = plt.gca()
-
-    for asset in self.portfolio.assetsByTime:
-      asset.plot(y=key,ax=plot)            
+    
+    dataDict = {}
+    for i,asset in enumerate(self.portfolio.assetsByTime):
+      xs = asset[key].index.strftime("%Y-%m-%d").values
+      ys = asset[key].values
+      points = zip(xs,ys)
+      dataDict[self.portfolio.symbols[i]] = points            
 
     plt.legend(self.portfolio.symbols)
     plot.set_title("Daily "+key)
     plt.show()
+    return toLine(dataDict)
 
+  def trainModel(self, epochs = 50):
+    train,val,test = self.dataset.split(.8,.9)
+    w, self.net, losses = self.train_func(self.net,train,epochs)
+    
+    self.losses = losses
+    self.epochs = epochs
+    if self.train_func == train_net_earnings:
+      x,y,losses,dates = validation_set_earnings(test,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates
+    else:
+      x,y,losses,dates = validation_set(test,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates
+      
+    self.validation_returns(x,y)
+
+  def plotLosses(self):
+    #plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
+    plt.plot(self.losses)
+    plt.show()
+          
+  def plotValidationLosses(self, show_last_x = -1):
+    batches = int(len(self.valid_losses)/self.epochs)
+    if show_last_x != -1:
+      y = self.valid_losses[-1*show_last_x:]
+    else:
+      y = self.valid_losses
+    x = self.valid_dates[-1*len(y):]
+    plt.plot(x,y)
+    ticks = [x[i] for i in range(0, len(x), 4)]
+    plt.xticks(ticks, rotation=45)
+    plt.show()
+        
+  
+  def testingSet(self):
+    #w,_ = train_net(self.dataset[:split],self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+    #w,net = train_net(self.dataset,self.time,self.portfolio.numAssets,self.numFeats,self.batch)
+    #self.net = net
+    #w = w.cpu()
+    #self.cumulativeReturns(w,slice(split,None))
+    if self.train_func == train_net_earnings:
+      x,y,losses,dates = validation_set_earnings(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates
+    else:
+      x,y,losses,dates = validation_set(self.dataset.testing_set,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates      
+    self.validation_returns(x,y)
+
+     
+  def validation_returns(self,x,y):
+    plt.plot(x,y)
+    plt.xticks(x, rotation=45)
+    plt.margins(0.2)
+    plt.subplots_adjust(bottom=0.15)
+    plt.show()
+          
+    
+  
 
 '''    
 stonks = ['aapl', 'msft', 'fb', 'goog']
@@ -273,10 +278,10 @@ ts = Tester(p,5,2)
 
 print(ts.topbottom([.25,.25,.25,.25]))
 '''
-#stonks = ['vti', 'agg', 'dbc', 'vixy']
+stonks = ['vti', 'agg', 'dbc', 'vixy']
 #stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
 #stonks = ['adbe', 'atvi', 'axon', 'blk', 'bx', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
-stonks = ['adbe', 'atvi', 'blk', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
+#stonks = ['adbe', 'atvi', 'blk', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
 
 '''
 p = P.Portfolio(stonks,client)
@@ -286,34 +291,22 @@ ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
 try:
-  p = P.Portfolio(stonks,client,earnings=True)
+  p = P.Portfolio(stonks,client,earnings=False)
 except SymbolError:
   f = open("error.txt","w")
   f.write("{error : \"symbolNotFound\"}")
   sys.exit(-1)
 
-p = P.Portfolio(stonks,client,earnings=True)
-ts = Tester(p,60,1,train_func = train_net_earnings)
+p = P.Portfolio(stonks,client,earnings=False)
+ts = Tester(p,10,60,train_func = train_net)
+json = ts.plotPortfolio()
+f = open("graph.json","w")
+f.write(json)
+
+
+
+'''
 ts.plotPortfolio()
 ts.plotLosses()
 ts.plotValidationLosses()
-'''
-r = ts.cumulativeReturns([.25,.25,.25,.25])
-r = r.dropna(0,'any')
-jsons = []
-xs = r['pdr'].index.strftime("%Y-%m-%d").values
-#ys = [x for x in r['pdr'].values if not np.isnan(x)]
-ys = r['pdr'].values
-print(ys)
-points = zip(xs,ys)
-d = {"id":"Cumulative Portfolio Returns",
-     "color": "hsl(29,70%,50%)",
-     "data":[{"x":x, "y":y} for x,y in points]}
-jsons.append(d)
-
-jstr = json.dumps(jsons)
-
-f = open('graph.json',"w")
-f.write(jstr)
-f.close()
 '''

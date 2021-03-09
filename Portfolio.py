@@ -44,8 +44,8 @@ class Portfolio:
     for a in assets:
 
       try:
-          df = client.balanceSheetDF(asset, period='quarter', last = 12).sort_index()[earnings_feats]
-        except p.common.PyEXception as e:
+          data = self.stockDF(self.client,a).sort_values(by = 'date')
+      except p.common.PyEXception as e:
           if "Response 404 - " in str(e):
             raise SymbolError
           elif "Response 402 - " in str(e):
