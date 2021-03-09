@@ -28,14 +28,16 @@ class Tester:
     self.portfolio = P
     self.time = timePeriod
     self.batch = batchSize
-    self.numFeats = p.featurized.shape[1]
+    self.numFeats = self.portfolio.featurized.shape[1]
     print("train_func:", train_func)
     if self.train_func == train_net_earnings:
-      self.dataset = Dataset.PortfolioDataSet(P.featurized,P.dates,timePeriod,P.numAssets,self.numFeats,batchSize,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features,test_length = test_length)
+      self.dataset = DailyDataset(P.featurized,P.assetsByTime,self.batch,P.numAssets,self.numFeats,timePeriod,forecast=True,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features,dates = P.dates)
+      self.net = NetWithEarnings(self.numFeats,P.num_earnings_features,P.numAssets,timePeriod) 
     else:
-      self.dataset = DailyDataset(P.featurized,P.assetsByTime,self.batch,P.numAssets,self.numFeats,timePeriod,forecast=True)
-    self.net = Net(self.numFeats,P.numAssets,timePeriod) 
-    self.trainModel()
+      self.dataset = DailyDataset(P.featurized,P.assetsByTime,self.batch,P.numAssets,self.numFeats,timePeriod,forecast=True,dates = P.dates)
+      self.net = Net(self.numFeats,P.numAssets,timePeriod)
+    
+    self.trainModel(epochs=epochs)
 
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
     closes = [x['close'][s] for x in self.portfolio.assetsByTime]
@@ -95,9 +97,12 @@ class Tester:
       self.valid_losses = losses
       self.valid_dates = dates
     else:
-      x,y = validation_set(test,self.net,self.portfolio.numAssets,self.time)
+      x,y,losses,dates = validation_set(test,self.net,self.portfolio.numAssets,self.time)
+      self.valid_losses = losses
+      self.valid_dates = dates
+      
     self.validation_returns(x,y)
-    
+
   def plotLosses(self):
     #plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
     plt.plot(self.losses)
@@ -271,7 +276,7 @@ print(ts.topbottom([.25,.25,.25,.25]))
 #stonks = ['vti', 'agg', 'dbc', 'vixy']
 #stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
 #stonks = ['adbe', 'atvi', 'axon', 'blk', 'bx', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
-stonks = ['adbe', 'atvi', 'blk', 'cost', 'crm', 'csco', 'cvs', 'dis',"fuck", 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
+stonks = ['adbe', 'atvi', 'blk', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
 
 '''
 p = P.Portfolio(stonks,client)
@@ -287,7 +292,9 @@ except SymbolError:
   f.write("{error : \"symbolNotFound\"}")
   sys.exit(-1)
 
-ts = Tester(p,60,20,train_func = train_net)
+p = P.Portfolio(stonks,client,earnings=True)
+ts = Tester(p,60,1,train_func = train_net_earnings)
+ts.plotPortfolio()
 ts.plotLosses()
 ts.plotValidationLosses()
 '''

@@ -34,7 +34,7 @@ class NetWithEarnings(nn.Module):
     self.earnings_lin2 = nn.Linear(NUM_EARNING_FEATURES, NUM_ASSETS*TIME_PERIOD_LENGTH)
     self.final_lin = nn.Linear(NUM_ASSETS*2, NUM_ASSETS)
     self.soft_out = nn.Softmax(dim=2)
-  def forward(self, x, earnings, batch_len):
+  def forward(self, x, earnings):
     #print("input:",x,earnings)
     x, (h0, c0) = self.input(x)
     #x = x.reshape((batch_len, self.time* 64))
@@ -45,7 +45,7 @@ class NetWithEarnings(nn.Module):
     earnings = self.relu(earnings)
     earnings = self.earnings_lin2(earnings)
     earnings = self.relu(earnings)
-    earnings = earnings.reshape((batch_len, self.time, self.assets))
+    earnings = earnings.reshape((earnings.shape[0], self.time, self.assets))
     combined = torch.cat((x,earnings), dim = 2)
     #print(x.shape, combined.shape, self.assets)
     x = self.final_lin(combined)
