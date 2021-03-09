@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
+from Errors import *
 class Portfolio:
   def __init__(self,assets,client,earnings = False):
     self.symbols = assets
@@ -20,7 +21,17 @@ class Portfolio:
                           'shortTermInvestments', 'totalAssets', 'totalCurrentLiabilities', 'totalLiabilities']
       self.num_earnings_features = len(earnings_feats) * self.numAssets
       for i,asset in enumerate(assets):
-        df = client.balanceSheetDF(asset, period='quarter', last = 12).sort_index()[earnings_feats]
+
+        try:
+          df = client.balanceSheetDF(asset, period='quarter', last = 12).sort_index()[earnings_feats]
+        except p.common.PyEXception as e:
+          if "Response 404 - " in str(e):
+            raise SymbolError
+          elif "Response 402 - " in str(e):
+            raise CreditError
+          else:
+            raise UknownError
+
         normalized_df = (df-df.mean())/df.std()
         normalized_df = normalized_df.fillna(0).replace(np.nan,0)
         self.earnings_dfs.append(normalized_df)
@@ -31,13 +42,24 @@ class Portfolio:
     m = float('inf')
     tmp = []
     for a in assets:
-      data = self.stockDF(self.client,a).sort_values(by = 'date')
+
+      try:
+          df = client.balanceSheetDF(asset, period='quarter', last = 12).sort_index()[earnings_feats]
+        except p.common.PyEXception as e:
+          if "Response 404 - " in str(e):
+            raise SymbolError
+          elif "Response 402 - " in str(e):
+            raise CreditError
+          else:
+            raise UknownError
+
       if earnings:
         data = data.loc[min_date:]
       data["returns"] = data["close"].values-data["open"].values
       
       m = min(m,len(data))
       tmp.append(data)
+
     for a in tmp:
       self.assetsByTime.append(a[:m])
     
@@ -45,18 +67,6 @@ class Portfolio:
     for a in self.assetsByTime:
       print(len(a)) 
     
-    '''
-    change = []
-    for a in self.assetsbytime:
-      print(a['close'])
-      x = a['close'].pct_change().values
-      x = torch.tensor(x).reshape(-1,1)
-      change.append(x)
-    for x in change:
-      x[0][0] = 1
-    
-    self.pctchange = torch.cat(change,1) 
-    '''
     self.featurized,self.dates = self.featurize(self.assetsByTime)
 
   def printAssets(self):

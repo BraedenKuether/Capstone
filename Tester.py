@@ -1,9 +1,11 @@
 import pyEX as px
+from Errors import *
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 import json
+import sys
 
 import Portfolio as P
 import Dataset 
@@ -13,6 +15,12 @@ from Trainer import *
 
 IEX_TOKEN = "Tpk_647cd93d6c5842d6978e55c6f79b0e1a"
 client = px.Client(IEX_TOKEN, version="sandbox")
+
+
+#print(px.account.metadataDF(token="pk_239736f61af84f61af18f0c68c920b06"))
+#px.account.payAsYouGo(False)
+#print(px.account.metadataDF())
+
 
 class Tester:
   def __init__(self,P,timePeriod,batchSize,train_func = train_net, test_length = 126,epochs=100):
@@ -177,7 +185,7 @@ class Tester:
     returns = returns.dot(weights)
 
     benchMark = client.chartDF(market,timeframe='5y')['close'].pct_change()[1:]
-            
+
     beta,alpha = stats.linregress(benchMark.values,returns.values)[0:2]
             
     if withPlot:
@@ -263,7 +271,7 @@ print(ts.topbottom([.25,.25,.25,.25]))
 #stonks = ['vti', 'agg', 'dbc', 'vixy']
 #stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
 #stonks = ['adbe', 'atvi', 'axon', 'blk', 'bx', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
-stonks = ['adbe', 'atvi', 'blk', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
+stonks = ['adbe', 'atvi', 'blk', 'cost', 'crm', 'csco', 'cvs', 'dis',"fuck", 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
 
 '''
 p = P.Portfolio(stonks,client)
@@ -272,13 +280,14 @@ ts.plotPortfolio()
 ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
 '''
 
-p = P.Portfolio(stonks,client,earnings=True)
-<<<<<<< HEAD
+try:
+  p = P.Portfolio(stonks,client,earnings=True)
+except SymbolError:
+  f = open("error.txt","w")
+  f.write("{error : \"symbolNotFound\"}")
+  sys.exit(-1)
+
 ts = Tester(p,60,20,train_func = train_net)
-ts.plotPortfolio()
-=======
-ts = Tester(p,60,1,train_func = train_net_earnings)ts.plotPortfolio()
->>>>>>> e9fbdbfbec9e78728c333e649ccc12044e8d309f
 ts.plotLosses()
 ts.plotValidationLosses()
 '''

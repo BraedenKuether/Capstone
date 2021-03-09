@@ -44,7 +44,8 @@ def train_net(net,batches,epochs):
     for X,y in batches:
       optimizer.zero_grad()
       out = net.forward(X)
-      loss = loss_fn(out,y)      acc += loss.item()
+      loss = loss_fn(out,y)
+      acc += loss.item()
       loss.backward()
       optimizer.step()
     lossVs.append(acc/len(batches))
