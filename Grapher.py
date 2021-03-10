@@ -11,7 +11,12 @@ class LineItem:
     self.data = data
     self.color = "hsl(198, 70%, 50%)"
 
-  
+class Bar:
+  def __init__(self,id,data):
+    self.ticker = id
+    self.returns = data
+    self.returnsColor = "hsl(198, 70%, 50%)"
+
 def toLine(dataDict):
   #dict from names to data
   items = []
@@ -22,7 +27,13 @@ def toLine(dataDict):
   
   return json.dumps(items)
 
-
+def toBar(dataDict):
+  items = []
+  for name in dataDict.keys():
+    point = Bar(name,dataDict[name]).__dict__
+    items.append(point)
+  
+  return json.dumps(items)
 
 
 

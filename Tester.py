@@ -1,4 +1,5 @@
 import pyEX as px
+from datetime import datetime
 from Errors import *
 import pandas as pd
 from Grapher import *
@@ -59,6 +60,11 @@ class Tester:
 
     return toLine(dataDict) 
        
+  
+  def find(self,a,year):
+    for i,x in enumerate(a):
+      if year == x:
+        return i
 
   def topbottom(self,weights):
     symbs = self.portfolio.symbols
@@ -66,17 +72,29 @@ class Tester:
     changes = map(lambda stock: (stock.iloc[-1]-stock.iloc[0])/stock.iloc[0], closes)
     changes = np.array(list(changes))
     withSyms = list(zip(changes,symbs))
-    top = max(withSyms)
-    bottom = min(withSyms)
-    return (changes.dot(weights)) + 1,top,bottom 
+    dataDict = {}
+    for x,name in withSyms:
+      dataDict[name] = x
 
-  def performance(self,weights,timePeriod="ytd"):
+    return toBar(dataDict)  
+
+  def totalPerformance(self,weights):
+    currentYear = datetime.today().year
     ytds = [s['close'] for s in self.portfolio.assetsByTime]
     changes = map(lambda stock: (stock.iloc[-1]-stock.iloc[0])/stock.iloc[0], ytds)
     changes = np.array(list(changes))
-    top = max(changes)
-    top = min(changes)
-    return ((changes.dot(weights)) + 1) 
+    changes = (changes.dot(weights)) + 1 
+    return changes 
+   
+  def ytdPerformance(self,weights):
+    currentYear = datetime.today().year
+    ytds = [s['close'] for s in self.portfolio.assetsByTime]
+    a = ytds[0].index.year
+    start = self.find(a,currentYear)
+    changes = map(lambda stock: (stock.iloc[-1]-stock.iloc[start])/stock.iloc[start], ytds)
+    changes = np.array(list(changes))
+    changes = (changes.dot(weights)) + 1 
+    return changes 
         
   def spYTD(self,timePeriod="ytd"):
     spy = client.chartDF(symbol="spy",timeframe=timePeriod).sort_index()['close']
@@ -151,11 +169,13 @@ class Tester:
       if peR != None:
         pes.append(peR)
         found.append(syms[i])
-      if found and withPlot:
-        plt.bar(range(len(pes)),pes)
-        plt.xticks(range(len(found)),found)
-        plt.show()
-    return np.mean(pes),pes 
+    
+    if found:
+      dataDict = {}
+      withSymbs = zip(pes,syms)
+      for x,name in withSymbs:
+        dataDict[name] = float(x)
+      return toBar(dataDict),np.mean(pes) 
 
 
   def dividendYield(self,withPlot=True):
@@ -169,11 +189,12 @@ class Tester:
         divs.append(divY)
         found.append(syms[i])
     
-    if found and withPlot:
-      plt.bar(range(len(divs)),divs)
-      plt.xticks(range(len(found)),found)
-      plt.show()
-    return syms 
+    if found:
+      dataDict = {}
+      withSymbs = zip(divs,syms)
+      for x,name in withSymbs:
+        dataDict[name] = float(x)
+      return toBar(dataDict) 
 
   def psRatio(self,withPlot=True):
     syms = self.portfolio.symbols 
@@ -186,11 +207,12 @@ class Tester:
         ps.append(psR)
         found.append(syms[i])
 
-    if found and withPlot:
-      plt.bar(range(len(ps)),ps)
-      plt.xticks(range(len(found)),found)
-      plt.show()
-    return np.mean(ps),ps 
+    if found:
+      dataDict = {}
+      withSymbs = zip(ps,syms)
+      for x,name in withSymbs:
+        dataDict[name] = float(x)
+      return toBar(dataDict),np.mean(ps) 
 
 
   def plotPortfolio(self,key="close"):
@@ -299,9 +321,19 @@ except SymbolError:
 
 p = P.Portfolio(stonks,client,earnings=False)
 ts = Tester(p,10,60,train_func = train_net)
-json = ts.plotPortfolio()
-f = open("graph.json","w")
-f.write(json)
+
+performancejson = ts.ytdPerformance([.25,.25,.25,.25])
+topbjson = ts.topbottom([.25,.25,.25,.25])
+perjson = ts.peRatio()
+dyjson = ts.dividendYield()
+psjson = ts.psRatio()
+print(performancejson)
+print(topbjson)
+print(perjson)
+print(dyjson)
+print(psjson)
+#f = open("graph.json","w")
+#f.write(json)
 
 
 
