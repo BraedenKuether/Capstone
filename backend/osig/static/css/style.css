@@ -78,3 +78,17 @@ nav {
     text-align: center;
     color: black;
 }
+
+
+/* START OF STOCK RESEARCH PAGE CSS */
+
+h3, h2 {
+    background-color: #DC4405 !important;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+}
+
+button {
+    background-color: #DC4405 !important;
+}

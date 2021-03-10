@@ -4,4 +4,117 @@
 
 {% block content %}
 
+    <div class="data-selector col-md-3 w-25 p-3 h-100" style="padding: 10px; outline: solid 3px black; margin-right: 30px;">
+        <div class="data-filter">
+            <h3>Data</h3>
+            <form>
+                <label for="ticker">Filter Ticker</label><br>
+                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /><br>
+                <label for="display-date">Display Date:</label><br>
+                <input type="date" id="display-data" name="display-date" min="2016-01-01"><br>
+                <input type="date" id="display-data" name="display-date"><br>
+                <label for="statement-selector">Select Financial Data</label>
+                    <select class="form-control" id="statment-selector">
+                        <option>Income Sheet</option>
+                        <option>Balanace Sheet</option>
+                        <option>Cash Flows</option>
+                        <option>Key Metrics</option>
+                    </select>
+                <br><button type="button" class="btn btn-primary btn-block">Submit</button><br>
+            </form>
+        </div>
+        
+        <div class="export-workbook">
+            <h3>Export Workbook</h3>
+            <form>
+                <label for="ticker">Filter Ticker</label><br>
+                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /><br>
+                <label for="display-date">Display Date:</label><br>
+                <input type="date" id="display-data" name="display-date" min="2016-01-01"><br>
+                <input type="date" id="display-data" name="display-date" max="2016-01-01"><br>
+                <label for="competitors">Competitors:</label><br>
+                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
+                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
+                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
+            </form>
+            <br><button type="button" class="btn btn-primary btn-block">Export</button>
+
+        </div>
+    </div>
+
+    <div class="data col-md-8 w-75 h-100" style="padding: 10px; outline: solid 3px black;">
+        <h2 style="text-align: center;">Income Statement</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td scope="col">Year (12 Months Ended)</td>
+                    <td scope="col">Dec. 31, 2020</td>
+                    <td scope="col">Dec. 31, 2019</td>
+                    <td scope="col">Dec. 31, 2018</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row" colspan="4" style="text-align: center;">Revenues</th>
+                </tr>
+                <tr>
+                    <th scope="row">Total Revenues</th>
+                    <td>24,578</td>
+                    <td>21,461</td>
+                    <td>11,795</td>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="4" style="text-align: center;">Cost of Revenues</th>
+                </tr>
+                <tr>
+                    <th scope="row">Total Cost of Revenues</th>
+                    <td>20,509</td>
+                    <td>17,419</td>
+                    <td>17,419</td>
+                </tr>
+                <tr>
+                    <th scope="row">Gross Profit</th>
+                    <td>20,509</td>
+                    <td>17,419</td>
+                    <td>17,419</td>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="4" style="text-align: center;">Operating Expenses</th>
+                </tr>
+                <tr>
+                    <th scope="row">Research and Development</th>
+                    <td>5,678</td>
+                    <td>7,467</td>
+                    <td>6,555</td>
+                </tr>
+                <tr>
+                    <th scope="row">Selling, General</th>
+                    <td>5,678</td>
+                    <td>7,467</td>
+                    <td>6,555</td>
+                </tr>
+                <tr>
+                    <th scope="row">Net Income (Loss)</th>
+                    <td>678</td>
+                    <td>467</td>
+                    <td>555</td>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="4" style="text-align: center;">Basic/Diluted EPS</th>
+                </tr>
+                <tr>
+                    <th scope="row">Basic EPS</th>
+                    <td>0</td>
+                    <td>-0.0011</td>
+                    <td>-0.0024</td>
+                </tr>
+                <tr>
+                    <th scope="row">Diluted EPS</th>
+                    <td>0</td>
+                    <td>-0.0011</td>
+                    <td>-0.0024</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}
