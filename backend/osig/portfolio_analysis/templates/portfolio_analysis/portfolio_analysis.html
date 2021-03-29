@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Stock Research</title>
+
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'stock_research/style.css' %}">
+    
+  </head>
+
+  <body>
+    <header>
+      {% block navbar %}
+      <nav>
+        <ul id="navbar">
+          <li class="navbar-item">{% block nav-home %}<a href="{% url 'home_page' %}">Home</a>{% endblock nav-home %}</li>
+          <li class="navbar-item">{% block nav-stock-research %}<a href="{% url 'stock_research' %}">Stock Research</a>{% endblock nav-stock-research %}</li>
+          <a href="{% url 'home_page' %}"><img src="../../static/stock_research/images/osig-word-logo-transparent.jpg" alt="OSIG Logo" /></a>
+          <li class="navbar-item"><a href="{% url 'home_page' %}">Portfolio Analysis</a></li>
+          <li class="navbar-item"><a href="{% url 'home_page' %}">About</a></li>
+        </ul>
+      </nav>
+      {% endblock navbar %}
+    </header>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+    <div>
+	    <h1>In every Englishman there is hidden something of a Whig that seems to tug at the heart strings</h1>
+    </div>
+  </body>
+
+</html>
