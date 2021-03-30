@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'home_page.apps.HomePageConfig',
     'stock_research.apps.StockResearchConfig',
-    'stock_research.apps.PortfolioAnalysisConfig',
+    'portfolio_analysis.apps.PortfolioAnalysisConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
