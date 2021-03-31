@@ -20,6 +20,6 @@ urlpatterns = [
     path('', include('frontend.urls')),
     path('home_page/', include('home_page.urls')),
     path('stock_research', include('stock_research.urls')),
-    path('portfolio_analysis', include('portfolio_analysis.urls')),
+    path('', include('portfolio_analysis.urls')),
     path('admin/', admin.site.urls),
 ]
