@@ -14,7 +14,7 @@ class PortfolioAnalysis extends Component {
   
   submit(values) {
     console.log(values);
-    var reqInit = {method: 'POST', body: values};
+    var reqInit = {method: 'POST', body: JSON.stringify(values)};
     console.log(reqInit)
     var req = new Request("api/portfolio_analysis", reqInit);
     console.log(req);
