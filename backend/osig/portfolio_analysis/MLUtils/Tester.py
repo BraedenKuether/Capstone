@@ -37,7 +37,10 @@ class Tester:
       self.net = Net(self.numFeats,P.numAssets,timePeriod)
     
     #self.trainModel(epochs=epochs)
-
+  
+  def setWeights(self,weights):
+    self.weights = weights
+    
   def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
     '''
       Calculates cumulative returns of the portfolio over a period
@@ -204,7 +207,7 @@ class Tester:
 
     return (252**.5)*sharpe
 
-  def alphabeta(self,weights,market="SPY",withPlot=True):
+  def alphabeta(self,weights,market="SPY",withPlot=False):
     '''
       calculates the so called alpha and beta metrics
       measures excess returns and volatitlity relative
@@ -356,7 +359,7 @@ class Tester:
       self.valid_losses = losses
       self.valid_dates = dates
       
-    self.validation_returns(x,y)
+    #self.validation_returns(x,y)
 
   def plotLosses(self):
     #plt.plot(x,self.losses[i*self.epochs:(i+1)*self.epochs])
