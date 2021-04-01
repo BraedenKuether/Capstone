@@ -21,7 +21,7 @@ client = px.Client(IEX_TOKEN, version="sandbox")
 def index(request):
     return render(request, 'portfolio_analysis/index.html')
 
-@api_view(['GET'])
+@api_view(['POST'])
 def get_json(request):
   tickers = request.query_params['q'].split('$')
   try:
