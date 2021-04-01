@@ -64,16 +64,12 @@ class PortfolioAnalysis extends Component {
                 className="invalid-feedback"
               />
               <label>
-              <Field type="checkbox" name="checked" value="Predictions" />
+              <Field type="checkbox" name="checked" value="pred" />
               Predictions
               </label>
               <label>
-              <Field type="checkbox" name="checked" value="Alpha" />
-              Alpha
-              </label>
-              <label>
-              <Field type="checkbox" name="checked" value="Beta" />
-              Beta
+              <Field type="checkbox" name="checked" value="alphabeta" />
+              Alpha Beta
               </label>
             </div>
             <button type="submit">Submit</button>
