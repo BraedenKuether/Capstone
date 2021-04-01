@@ -1,15 +1,37 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Django REST with React</title>
-</head>
-<body>
-<div id="app">
+  <head>
+    <meta charset="utf-8">
+    <title>OSIG Home</title>
+
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'home_page/style.css' %}">
+    
+  </head>
+
+  <body>
+    <header>
+      {% block navbar %}
+      <nav>
+        <ul id="navbar">
+          <li class="navbar-item">{% block nav-home %}<a href="{% url 'home_page' %}">Home</a>{% endblock nav-home %}</li>
+          <li class="navbar-item">{% block nav-stock-research %}<a href="{% url 'stock_research' %}">Stock Research</a>{% endblock nav-stock-research %}</li>
+          <a href="{% url 'home_page' %}"><img src="../../static/home_page/images/osig-word-logo-transparent.jpg" alt="OSIG Logo" /></a>
+          <li class="navbar-item"><a href="{% url 'home_page' %}">Portfolio Analysis</a></li>
+          <li class="navbar-item"><a href="{% url 'home_page' %}">About</a></li>
+        </ul>
+      </nav>
+      {% endblock navbar %}
+    </header>
+
+    <div id="contents">
     <!-- React will load here -->
-</div>
-</body>
+
+    </div>
+  </body>
+
 {% load static %}
 <script src="{% static "frontend/main.js" %}"></script>
 </html>
