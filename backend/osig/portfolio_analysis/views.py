@@ -27,27 +27,25 @@ def index(request):
 
 @api_view(['POST'])
 def get_json(request):
-  
   body_unicode = request.body.decode('utf-8')
   body = json.loads(body_unicode)
-  print(body) 
   tickers = body['tickers'].split(',')
   jobs = body['checked']
   try:
-    p = P.Portfolio(tickers,client,earnings=False)
+    p = P.Portfolio(tickers,client,earnings=True)
   except SymbolError:
     f = open("error.txt","w")
     f.write("{error : \"symbolNotFound\"}")
     sys.exit(-1)
 
   global user_environment
-  user_environment = T.Tester(p,10,60,train_func = train_net)
+  user_environment = T.Tester(p,15,1,train_func = train_net_earnings)
   
   results = {}
   for job in jobs:
     results[job] = handle(job,user_environment)
   
-  
+  print(results)
   return JsonResponse(results)
 
 def handle(job,env):
