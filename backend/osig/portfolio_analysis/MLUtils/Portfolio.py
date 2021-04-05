@@ -64,8 +64,8 @@ class Portfolio:
       self.assetsByTime.append(a[:m])
     
 
-    for a in self.assetsByTime:
-      print(len(a)) 
+    #for a in self.assetsByTime:
+    #  print(len(a)) 
     
     self.featurized,self.dates = self.featurize(self.assetsByTime)
 

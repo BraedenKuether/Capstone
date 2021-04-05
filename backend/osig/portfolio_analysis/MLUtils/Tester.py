@@ -28,7 +28,7 @@ class Tester:
     self.batch = batchSize
     self.numFeats = self.portfolio.featurized.shape[1]
     self.weights = []
-    print("train_func:", train_func)
+    #print("train_func:", train_func)
     if self.train_func == train_net_earnings:
       self.dataset = DailyDataset(P.featurized,P.assetsByTime,self.batch,P.numAssets,self.numFeats,timePeriod,forecast=True,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features,dates = P.dates)
       self.net = NetWithEarnings(self.numFeats,P.num_earnings_features,P.numAssets,timePeriod) 
@@ -359,6 +359,12 @@ class Tester:
       self.valid_losses = losses
       self.valid_dates = dates
       
+    data = []
+    for pX,pY in zip(x,y):
+      data.append({"x":pX,"y":pY})
+    reponse = [{"id": "Validation Set Performance", "color": "hsl(29,70%,50%)", "data": data}]
+    
+    return reponse
     #self.validation_returns(x,y)
 
   def plotLosses(self):
