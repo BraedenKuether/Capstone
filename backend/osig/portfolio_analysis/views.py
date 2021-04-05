@@ -42,7 +42,8 @@ def get_json(request):
 
   global user_environment
   user_environment = T.Tester(p,10,60,train_func = train_net)
-  
+  n = len(tickers)
+  user_environement.setWeights([1/n]*len(n)) 
   results = {}
   for job in jobs:
     results[job] = handle(job,user_environment)
@@ -53,5 +54,42 @@ def get_json(request):
 def handle(job,env):
   if job == "pred":
     return env.trainModel()
+  
   elif job == "alphabeta":
-    return env.alphabeta([.3333,.3333,.3333,])
+    return env.alphabeta(env.weights)
+  
+  elif job == 'cumreturns':
+    return env.cumualativeReturns(env.weights,withPlot=False)
+
+  elif job == 'topbottomperf':
+    return env.topbottom(env.weights)
+
+  elif job == 'totalperf':
+    return env.totalPerformance(env.weights)
+
+  elif job == 'ytdperf':
+    return env.ytdPerformance(env.weights)
+
+  elif job == 'spytd':
+    return env.spYTD()
+
+  elif job == 'portrisk':
+    return env.risk()
+
+  elif job == 'sharperatio':
+    return env.sharpe(env.weights)
+
+  elif job == 'priceearnings':
+    return env.peRatio(withPlot=False)
+
+  elif job == 'dividendyield':
+    return env.dividendYield(withPlot=False)
+
+  elif job == 'priceshares':
+    return env.psRatio(withPlot=False)
+
+  elif job == 'plotport':
+    return env.plotPortfolio()
+  
+  else:
+    return "something is fucked"
