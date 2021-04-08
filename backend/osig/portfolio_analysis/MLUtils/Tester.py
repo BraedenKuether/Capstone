@@ -351,18 +351,18 @@ class Tester:
     self.losses = losses
     self.epochs = epochs
     if self.train_func == train_net_earnings:
-      x,y,losses,dates = validation_set_earnings(test,self.net,self.portfolio.numAssets,self.time)
+      x,y,losses,dates, weights = validation_set_earnings(test,self.net,self.portfolio.numAssets,self.time)
       self.valid_losses = losses
       self.valid_dates = dates
     else:
-      x,y,losses,dates = validation_set(test,self.net,self.portfolio.numAssets,self.time)
+      x,y,losses,dates, weights = validation_set(test,self.net,self.portfolio.numAssets,self.time)
       self.valid_losses = losses
       self.valid_dates = dates
       
     data = []
     for pX,pY in zip(x,y):
       data.append({"x":pX,"y":pY})
-    reponse = [{"id": "Validation Set Performance", "color": "hsl(29,70%,50%)", "data": data}]
+    reponse = [{"id": "Validation Set Performance", "color": "hsl(29,70%,50%)", "data": data, "weights": weights}]
     
     return reponse
     #self.validation_returns(x,y)

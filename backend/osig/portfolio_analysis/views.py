@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from portfolio_analysis.models import AnalysisRun, AnalysisRunSerializer
 
 import pyEX as px
 import json
@@ -23,7 +24,23 @@ client = px.Client(IEX_TOKEN, version="sandbox")
 user_environment = None
 
 def index(request):
-    return render(request, 'portfolio_analysis/index.html')
+  return render(request, 'portfolio_analysis/index.html')
+   
+@api_view(['GET'])
+def get_run(request,id):
+  if id == 'all':
+    run = AnalysisRun(title='test',path='runs/1.json')
+    run.id = 1
+    run2 = AnalysisRun(title='test2',path='runs/2.json')
+    run2.id = 2
+    serializer = AnalysisRunSerializer(run)
+    serializer2 = AnalysisRunSerializer(run2)
+    resp = {'data': [serializer.data, serializer2.data]}
+  else:
+    id = int(id)
+    with open('portfolio_analysis/runs/1.json', 'r') as file:
+      resp = json.loads(file.read())
+  return JsonResponse(resp)
 
 @api_view(['POST'])
 def get_json(request):
@@ -39,14 +56,16 @@ def get_json(request):
     sys.exit(-1)
 
   global user_environment
-  user_environment = T.Tester(p,10,60,train_func = train_net)
+  user_environment = T.Tester(p,10,60,train_func = train_net_earnings)
   n = len(tickers)
-  user_environement.setWeights([1/n]*len(n)) 
+  user_environment.setWeights([1/n]*n) 
   results = {}
   for job in jobs:
     results[job] = handle(job,user_environment)
   
   print(results)
+  with open('portfolio_analysis/runs/1.json', 'w') as file:
+    file.write(json.dumps(results))
   return JsonResponse(results)
 
 def handle(job,env):

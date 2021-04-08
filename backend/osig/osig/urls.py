@@ -20,7 +20,7 @@ urlpatterns = [
     path('', include('frontend.urls')),
     path('home_page/', include('home_page.urls')),
     path('stock_research', include('stock_research.urls')),
-    path('portfolio_analysis', include('frontend.urls')),
-    path('api/portfolio_analysis', include('portfolio_analysis.urls')),
+    path('api/portfolio_analysis/', include('portfolio_analysis.urls')),
+    path('portfolio_analysis/', include('frontend.urls')),
     path('admin/', admin.site.urls),
 ]

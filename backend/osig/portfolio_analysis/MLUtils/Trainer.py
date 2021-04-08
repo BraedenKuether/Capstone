@@ -143,8 +143,13 @@ def validation_set(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
     simulation_day += len(X)
     if simulation_day >= TIME_PERIOD_LENGTH:
       simulation_day = 0
-      
-  return x,y_graph,losses,losses_dates
+  
+  print(len(batches[-1]))
+  last_x, _, _, _ = batches[-1]
+  last_x = last_x.double().to('cuda')
+  weights = net.forward(last_x)[-1][-1].view(NUM_ASSETS)
+  weights = weights.tolist()
+  return x,y_graph,losses,losses_dates, weights
   
 def validation_set_earnings(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   loss_fn = sharpe_loss
@@ -179,5 +184,12 @@ def validation_set_earnings(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
     simulation_day += len(X)
     if simulation_day >= TIME_PERIOD_LENGTH:
       simulation_day = 0
-  return x,y_graph,losses,losses_dates
+      
+  print(len(batches[-1]))
+  last_x, _, last_earnings, _, _ = batches[-1]
+  last_x = last_x.double().to('cuda')
+  last_earnings = last_earnings.double().to('cuda')
+  weights = net.forward(last_x, last_earnings)[-1][-1].view(NUM_ASSETS)
+  weights = weights.tolist()
+  return x,y_graph,losses,losses_dates, weights
 
