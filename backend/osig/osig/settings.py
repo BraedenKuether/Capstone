@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'home_page.apps.HomePageConfig',
     'stock_research.apps.StockResearchConfig',
-    'portfolio_analysis.apps.PortfolioAnalysisConfig',
+	'portfolio_analysis.apps.PortfolioAnalysisConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'osig.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dbmaster',
+        'HOST': 'ls-a62449c6a9269d6299b0926073c1490836c081f4.cici8ggcf7ry.us-west-2.rds.amazonaws.com',
+        'PORT': '3306',
+        'USER': 'capstone',
+        'PASSWORD': 'F%z,N;?v1$,buo.]sKj%oxx(*LK5DVe+',
     }
 }
 
