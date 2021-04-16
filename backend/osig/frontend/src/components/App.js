@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Graph from "./Graph";
 import PortfolioAnalysis from "./PortfolioAnalysis";
+import RunView from "./RunView";
 
 class App extends Component {
     render() {
@@ -17,6 +18,7 @@ class App extends Component {
         <Switch>
             <Route exact path="/" component={Graph} />
             <Route exact path="/portfolio_analysis" component={PortfolioAnalysis} />
+            <Route path="/portfolio_analysis/view_run" component={RunView} />
         </Switch>
     </Router>
     );

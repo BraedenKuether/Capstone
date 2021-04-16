@@ -9,44 +9,86 @@ class PortfolioAnalysis extends Component {
     this.state = {
       data: [],
       loaded: false,
-      placeholder: "Loading"
+      placeholder: "Loading",
+      runs: []
     };
   }
-  
-  submit(values) {
-    var reqInit = {method: 'POST', body: JSON.stringify(values)};
-    var req = new Request("api/portfolio_analysis", reqInit);
+
+  componentDidMount() {
+    var reqInit = {method: 'GET'};
+    var req = new Request(window.location.origin.concat("/api/portfolio_analysis/get_runs/all"), reqInit);
     fetch(req)
       .then(response => response.json())
       .then(data => {
-        console.log(data.pred);
         this.setState({
-          data: data.pred
+          runs: data.data,
+          loaded: true
         });
     })
   }
   
-  componentDidMount() {
-    this.setState(() => {
-      return {
-        loaded: true
-      };
-    });
+  renderTableHeader() {
+    if(this.state.loaded && this.state.runs.length > 0) {
+      let header = Object.keys(this.state.runs[0])
+      return header.map((key, index) => {
+        return <th key={index}>{key.toUpperCase()}</th>
+      })
+    } else {
+      return <th></th>
+    }
+  }
+  
+  renderTableData() {
+    if(this.state.loaded && this.state.runs.length > 0) {
+      return this.state.runs.map((run, index) => {
+        const { id, title, date } = run //destructuring
+        let id_url = 'view_run/'.concat(id)
+        return (
+          <tr key={id}>
+            <td><a href={id_url}>{title}</a></td>
+            <td>{date}</td>
+            <td>{id}</td>
+          </tr>
+         )
+      })
+    } else {
+      return (
+        <tr>
+          <td></td>
+        </tr>
+      )
+    }
+  }
+  
+  submit(values) {
+    var reqInit = {method: 'POST', body: JSON.stringify(values)};
+    console.log(values);
+    let api_endpoint = window.location.origin.concat("/api/portfolio_analysis/create_run");
+    console.log("submitting ".concat(api_endpoint));
+    var req = new Request(api_endpoint, reqInit);
+    fetch(req)
+      .then(response => response.text())
+      .then(data => {
+        this.componentDidMount();
+    })
   }
 
   render() {
     return (
-      <div className='temp'>
+      <div className='PortfolioContainer'>
         <h1>Portfolio Analysis</h1>
         <Formik
          initialValues={{ 
           tickers: '', 
-          checked: []
+          title: ''
          }}
          validate={values => {
            const errors = {};
            if (!values.tickers) {
              errors.tickers = 'Required';
+           }
+           if (!values.title) {
+             errors.title = 'Required';
            }
            return errors;
          }}
@@ -72,81 +114,38 @@ class PortfolioAnalysis extends Component {
                 name="tickers"
                 className="invalid-feedback"
               />
-              <label>
-              <Field type="checkbox" name="checked" value="pred" />
-              Predictions
-              </label>
-              <label>
-              <Field type="checkbox" name="checked" value="alphabeta" />
-              Alpha Beta
-              </label>
+              <label>Title</label>
+              <Field
+               type="text"
+               name="title"
+               id="title"
+               placeholder="Name This Run"
+               onChange={props.handleChange}
+               onBlur={props.handleBlur}
+               value={props.values.title}
+               />
+               <ErrorMessage
+                component="div"
+                name="title"
+                className="invalid-feedback"
+              />
             </div>
             <button type="submit">Submit</button>
           </Form>
         )
         }
         </Formik>
-      <div style={{height:'600px',width:'1200px'}}>
-       <ResponsiveLine
-        data={this.state.data}
-         margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-          xScale={{ type: 'point' }}
-           yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
-            yFormat=" >-.2f"
-             axisTop={null}
-              axisRight={null}
-               axisBottom={{
-                orient: 'bottom',
-                 tickSize: 5,
-                  tickPadding: 5,
-                   tickRotation: 0,
-                    legend: 'transportation',
-                     legendOffset: 36,
-                      legendPosition: 'middle'
-                       }}
-                        axisLeft={{
-                         orient: 'left',
-                          tickSize: 5,
-                           tickPadding: 5,
-                            tickRotation: 0,
-                             legend: 'count',
-                              legendOffset: -40,
-                               legendPosition: 'middle'
-                                }}
-                                 pointSize={10}
-                                  pointColor={{ theme: 'background' }}
-                                   pointBorderWidth={2}
-                                    pointBorderColor={{ from: 'serieColor' }}
-                                     pointLabelYOffset={-12}
-                                      useMesh={true}
-                                       legends={[
-                                        {
-                                         anchor: 'bottom-right',
-                                          direction: 'column',
-                                           justify: false,
-                                            translateX: 100,
-                                             translateY: 0,
-                                              itemsSpacing: 0,
-                                               itemDirection: 'left-to-right',
-                                                itemWidth: 80,
-                                                 itemHeight: 20,
-                                                  itemOpacity: 0.75,
-                                                   symbolSize: 12,
-                                                    symbolShape: 'circle',
-                                                     symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                                                      effects: [
-                                                       {
-                                                        on: 'hover',
-                                                         style: {
-                                                          itemBackground: 'rgba(0, 0, 0, .03)',
-                                                           itemOpacity: 1
-                                                            }
-                                                             }
-                                                              ]
-                                                               }
-                                                                ]}
-                                                                 />
-      </div>
+        {this.state.loaded &&
+          <div>
+          <h1 id='title'>Previous Runs</h1>
+          <table id='runs'>
+            <tbody>
+              <tr>{this.renderTableHeader()}</tr>
+              {this.renderTableData()}
+            </tbody>
+          </table>
+          </div>
+        }
       </div>
     );
   }

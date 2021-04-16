@@ -18,6 +18,8 @@ from rest_framework.decorators import permission_classes
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from portfolio_analysis.models import AnalysisRun, AnalysisRunSerializer
+from django.core.serializers import serialize
 
 import pyEX as px
 import json
@@ -29,16 +31,45 @@ user_environment = None
 
 
 def index(request):
-    return render(request, 'portfolio_analysis/index.html')
+  return render(request, 'portfolio_analysis/index.html')
+   
+@api_view(['GET'])
+def get_run(request,id):
+  if id == 'all':
+    '''
+    run = AnalysisRun(title='test',path='runs/1.json')
+    run.id = 1
+    run2 = AnalysisRun(title='test2',path='runs/2.json')
+    run2.id = 2
+    serializer = AnalysisRunSerializer(run)
+    serializer2 = AnalysisRunSerializer(run2)
+    '''
+    runs = AnalysisRun.objects.all()
+    if len(runs) > 0:
+      serializer = json.loads(serialize('json',runs,fields=('id','title','date')))
+      data = []
+      for run in serializer:
+        run_formatted = run['fields']
+        run_formatted['id'] = run['pk']
+        data.append(run_formatted)
+      print(data)
+      resp = {'data': data}
+    else:
+      resp = {'data': []}
+  else:
+    with open('portfolio_analysis/runs/{}.json'.format(id), 'r') as file:
+      resp = json.loads(file.read())
+  return JsonResponse(resp)
 
 @api_view(['POST'])
 #@authentication_classes([BasicAuthentication])
 #@permission_classes([IsAuthenticated])
-def get_json(request):
+def create_run(request):
+  print('creating run')
   body_unicode = request.body.decode('utf-8')
   body = json.loads(body_unicode)
   tickers = body['tickers'].split(',')
-  jobs = body['checked']
+  title = body['title']
   try:
     p = P.Portfolio(tickers,client,earnings=True)
   except SymbolError:
@@ -47,15 +78,24 @@ def get_json(request):
     sys.exit(-1)
 
   global user_environment
-  user_environment = T.Tester(p,10,60,train_func = train_net)
+  user_environment = T.Tester(p,10,60,train_func = train_net_earnings)
   n = len(tickers)
-  user_environement.setWeights([1/n]*len(n)) 
+  user_environment.setWeights([1/n]*n) 
   results = {}
+  #jobs = ["pred", "alphabeta", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "portrisk", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
+  jobs = ["pred", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
   for job in jobs:
     results[job] = handle(job,user_environment)
   
-  print(results)
-  return JsonResponse(results)
+  run = AnalysisRun(title=title,path='')
+  run.save()
+  id = run.id
+  path = 'portfolio_analysis/runs/{}.json'.format(id)
+  run.path = path
+  run.save()
+  with open(run.path, 'w') as file:
+    file.write(json.dumps(results))
+  return HttpResponse('Run Created')
 
 def handle(job,env):
   if job == "pred":
@@ -65,7 +105,7 @@ def handle(job,env):
     return env.alphabeta(env.weights)
   
   elif job == 'cumreturns':
-    return env.cumualativeReturns(env.weights,withPlot=False)
+    return env.cumulativeReturns(env.weights,withPlot=False)
 
   elif job == 'topbottomperf':
     return env.topbottom(env.weights)
