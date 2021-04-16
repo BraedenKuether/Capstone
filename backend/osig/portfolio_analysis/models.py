@@ -11,6 +11,7 @@ class AnalysisRun(models.Model):
   date = models.DateField(default=datetime.date.today)
   
 class AnalysisRunSerializer(serializers.Serializer):
-  id = serializers.IntegerField()
-  title = serializers.CharField(max_length=100)
+  id = serializers.ReadOnlyField()
   date = serializers.DateField()
+  title = serializers.CharField(max_length=100)
+  

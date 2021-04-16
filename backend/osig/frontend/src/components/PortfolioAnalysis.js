@@ -28,8 +28,7 @@ class PortfolioAnalysis extends Component {
   }
   
   renderTableHeader() {
-    if(this.state.loaded) {
-      console.log(this.state.runs);
+    if(this.state.loaded && this.state.runs.length > 0) {
       let header = Object.keys(this.state.runs[0])
       return header.map((key, index) => {
         return <th key={index}>{key.toUpperCase()}</th>
@@ -40,29 +39,37 @@ class PortfolioAnalysis extends Component {
   }
   
   renderTableData() {
-    return this.state.runs.map((run, index) => {
-      const { id, title, date } = run //destructuring
-      let id_url = 'view_run/'.concat(id)
+    if(this.state.loaded && this.state.runs.length > 0) {
+      return this.state.runs.map((run, index) => {
+        const { id, title, date } = run //destructuring
+        let id_url = 'view_run/'.concat(id)
+        return (
+          <tr key={id}>
+            <td><a href={id_url}>{title}</a></td>
+            <td>{date}</td>
+            <td>{id}</td>
+          </tr>
+         )
+      })
+    } else {
       return (
-        <tr key={id}>
-          <td>{id}</td>
-          <td><a href={id_url}>{title}</a></td>
-          <td>{date}</td>
+        <tr>
+          <td></td>
         </tr>
-       )
-    })
+      )
+    }
   }
   
   submit(values) {
     var reqInit = {method: 'POST', body: JSON.stringify(values)};
-    var req = new Request("api/portfolio_analysis", reqInit);
+    console.log(values);
+    let api_endpoint = window.location.origin.concat("/api/portfolio_analysis/create_run");
+    console.log("submitting ".concat(api_endpoint));
+    var req = new Request(api_endpoint, reqInit);
     fetch(req)
-      .then(response => response.json())
+      .then(response => response.text())
       .then(data => {
-        console.log(data.pred);
-        this.setState({
-          data: data.pred
-        });
+        this.componentDidMount();
     })
   }
 
@@ -73,12 +80,15 @@ class PortfolioAnalysis extends Component {
         <Formik
          initialValues={{ 
           tickers: '', 
-          checked: []
+          title: ''
          }}
          validate={values => {
            const errors = {};
            if (!values.tickers) {
              errors.tickers = 'Required';
+           }
+           if (!values.title) {
+             errors.title = 'Required';
            }
            return errors;
          }}
@@ -104,27 +114,38 @@ class PortfolioAnalysis extends Component {
                 name="tickers"
                 className="invalid-feedback"
               />
-              <label>
-              <Field type="checkbox" name="checked" value="pred" />
-              Predictions
-              </label>
-              <label>
-              <Field type="checkbox" name="checked" value="alphabeta" />
-              Alpha Beta
-              </label>
+              <label>Title</label>
+              <Field
+               type="text"
+               name="title"
+               id="title"
+               placeholder="Name This Run"
+               onChange={props.handleChange}
+               onBlur={props.handleBlur}
+               value={props.values.title}
+               />
+               <ErrorMessage
+                component="div"
+                name="title"
+                className="invalid-feedback"
+              />
             </div>
             <button type="submit">Submit</button>
           </Form>
         )
         }
         </Formik>
-        <h1 id='title'>Previous Runs</h1>
-        <table id='students'>
-          <tbody>
-            <tr>{this.renderTableHeader()}</tr>
-            {this.renderTableData()}
-          </tbody>
-        </table>
+        {this.state.loaded &&
+          <div>
+          <h1 id='title'>Previous Runs</h1>
+          <table id='runs'>
+            <tbody>
+              <tr>{this.renderTableHeader()}</tr>
+              {this.renderTableData()}
+            </tbody>
+          </table>
+          </div>
+        }
       </div>
     );
   }

@@ -22,6 +22,7 @@ class RunView extends Component {
     fetch(req)
       .then(response => response.json())
       .then(data => {
+        console.log(data);
         console.log(data.pred);
         this.setState({
           graph_data: data.pred,

@@ -330,7 +330,7 @@ class Tester:
       returns:
         json object representing a line graph of the data
     '''
-    plot = plt.gca()
+    #plot = plt.gca()
     
     dataDict = {}
     for i,asset in enumerate(self.portfolio.assetsByTime):
@@ -339,9 +339,9 @@ class Tester:
       points = zip(xs,ys)
       dataDict[self.portfolio.symbols[i]] = points            
 
-    plt.legend(self.portfolio.symbols)
-    plot.set_title("Daily "+key)
-    plt.show()
+    #plt.legend(self.portfolio.symbols)
+    #plot.set_title("Daily "+key)
+    #plt.show()
     return toLine(dataDict)
 
   def trainModel(self, epochs = 50):
