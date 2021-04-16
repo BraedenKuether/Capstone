@@ -9,7 +9,12 @@ from django.template import Context, loader
 from django.http import JsonResponse
 
 from rest_framework.response import Response
+
 from rest_framework.decorators import api_view
+from rest_framework.decorators import authentication_classes 
+from rest_framework.decorators import permission_classes
+
+
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -22,10 +27,13 @@ client = px.Client(IEX_TOKEN, version="sandbox")
 
 user_environment = None
 
+
 def index(request):
     return render(request, 'portfolio_analysis/index.html')
 
 @api_view(['POST'])
+#@authentication_classes([BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def get_json(request):
   body_unicode = request.body.decode('utf-8')
   body = json.loads(body_unicode)
