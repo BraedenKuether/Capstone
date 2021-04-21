@@ -1,0 +1,11 @@
+{% extends "stock_research/base_stock_research.html" %}
+
+{% block stockContent %}
+
+    <div class="data col-md-8 w-75 h-100" style="padding: 10px; outline: solid 3px black;">
+        <h2 style="text-align: center;">Income Statement</h2>
+            {% for field in form %}
+            {% endfor %}
+    </div>
+
+{% endblock stockContent %}
