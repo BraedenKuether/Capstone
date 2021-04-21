@@ -1,16 +1,26 @@
-{% extends "base.html" %}
+{% extends "base.html" %} 
+{% load i18n %}
+
+{% block title %}Home{% endblock title %}
+
+{% block nav-home %}<a class="nav-link active" aria-current="page" href="{% url 'home_page' %}">Home</a>{% endblock nav-home %}
 
 {% block content %}
-<div id="screenshot">
 
-</div>
-
-<iframe id="calendar" src="https://calendar.google.com/calendar/embed?src=oregonstate.edu_h8k929p1os2a1308crm54q8ihg%40group.calendar.google.com&ctz=America%2FLos_Angeles" style="border: 0" width="600" height="400" frameborder="0" scrolling="no"></iframe>
+<iframe
+  id="calendar"
+  src="https://calendar.google.com/calendar/embed?src=oregonstate.edu_h8k929p1os2a1308crm54q8ihg%40group.calendar.google.com&ctz=America%2FLos_Angeles"
+  style="border: 0"
+  width="600"
+  height="400"
+  frameborder="0"
+  scrolling="no"
+></iframe>
 
 <div id="resources">
-<h1>Resources</h1>
-<ul>
+  <h1>Resources</h1>
+  <ul>
     <li>Stocks</li>
-<ul>
+  </ul>
 </div>
 {% endblock content %}
