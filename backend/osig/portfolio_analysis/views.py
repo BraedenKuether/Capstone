@@ -83,7 +83,8 @@ def create_run(request):
   user_environment.setWeights([1/n]*n) 
   results = {}
   #jobs = ["pred", "alphabeta", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "portrisk", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
-  jobs = ["pred", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
+  jobs = ["pred", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "portrisk", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
+  results['tickers'] = tickers
   for job in jobs:
     results[job] = handle(job,user_environment)
   
@@ -120,7 +121,7 @@ def handle(job,env):
     return env.spYTD()
 
   elif job == 'portrisk':
-    return env.risk()
+    return env.risk(env.weights)
 
   elif job == 'sharperatio':
     return env.sharpe(env.weights)

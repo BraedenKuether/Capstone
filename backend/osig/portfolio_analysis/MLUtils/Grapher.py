@@ -25,7 +25,7 @@ def toLine(dataDict):
     points = [DataPoint(x,y).__dict__ for x,y in dataDict[name]] 
     items.append(LineItem(name,points).__dict__)
   
-  return json.dumps(items)
+  return items
 
 def toBar(dataDict):
   items = []
@@ -33,12 +33,12 @@ def toBar(dataDict):
     point = Bar(name,dataDict[name]).__dict__
     items.append(point)
   
-  return json.dumps(items)
+  return items
 
 
 def weightsToJson(weights):
   data = {"weights":weights}
-  return json.dumps(data)
+  return data
 
 
 
