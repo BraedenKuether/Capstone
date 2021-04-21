@@ -75,7 +75,6 @@ TEMPLATES = [
 ]
 
 
-  )
 WSGI_APPLICATION = 'osig.wsgi.application'
 
 
