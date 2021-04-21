@@ -20,18 +20,24 @@ def index(request):
 
 def income_statement(request, ticker):
     form = client.incomeStatement(ticker, period='annual', last=4, format='json')
-    logger.debug("--------------------------------------------------------------")
-    logger.info(json.dumps(form, indent=4))
+    logger.debug("-----------------------LOGGING INCOME STATEMENT JSON-----------------------")
+    logger.info(json.dumps(form, sort_keys=True, indent=4))
     return render(request, 'stock_research/income_statement.html', {'form': form})
 
 def balance_sheet(request, ticker):
     form = client.balanceSheet(ticker, period='annual', last=4, format='json')
-    return render(request, 'stock_research/income_statement.html', {'form': form})
+    logger.debug("-----------------------LOGGING BALANCE SHEET JSON-----------------------")
+    logger.info(json.dumps(form, sort_keys=True, indent=4))
+    return render(request, 'stock_research/balance_sheet.html', {'form': form})
 
 def cash_flows(request, ticker):
     form = client.cashFlows(ticker, period='annual', last=4, format='json')
-    return render(request, 'stock_research/income_statement.html', {'form': form})
+    logger.debug("-----------------------LOGGING CASH FLOWS JSON-----------------------")
+    logger.info(json.dumps(form, sort_keys=True, indent=4))
+    return render(request, 'stock_research/cash_flows.html', {'form': form})
 
 def financials(request, ticker):
     form = client.financials(ticker)
-    return render(request, 'stock_research/income_statement.html', {'form': form})
+    logger.debug("-----------------------LOGGING FINANCIALS JSON-----------------------")
+    logger.info(json.dumps(form, sort_keys=True, indent=4))
+    return render(request, 'stock_research/financials.html', {'form': form})
