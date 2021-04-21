@@ -3,47 +3,51 @@
 
 {% block title %}Stock Research{% endblock title %}
 
+{% block nav-stock-research %}<a class="nav-link active" aria-current="page" href="{% url 'stock_research' %}">Stock Research</a>{% endblock nav-stock-research %}
+
 {% block content %}
 
-    <div class="data-selector col-md-3 w-25 p-3 h-100" style="padding: 10px; outline: solid 3px black; margin-right: 30px;">
-        <div class="data-filter">
-            <h3 class="border border-white rounded text-center text-white p-1">Data</h3>
-            <form method="post">
-                <label for="ticker">Filter Ticker</label><br>
-                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /><br>
-                <label for="display-date">Display Date:</label><br>
-                <input type="date" id="display-data" name="display-date" min="2016-01-01"><br>
-                <input type="date" id="display-data" name="display-date"><br>
-                <label for="statement-selector">Select Financial Data</label>
-                    <select class="form-control" id="statment-selector">
-                        <option value="income_statement">Income Statement</option>
-                        <option value="balance_sheet">Balanace Sheet</option>
-                        <option value="cash_flows">Cash Flows</option>
-                        <option value="financials">Key Metrics</option>
-                    </select>
-                <br><button type="button" class="btn btn-primary btn-block border border-white rounded">Submit</button><br>
-            </form>
-        </div>
-        
-        <div class="export-workbook">
-            <h3 class="border border-white rounded text-center text-white p-1">Export Workbook</h3>
-            <form>
-                <label for="ticker">Filter Ticker</label><br>
-                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /><br>
-                <label for="display-date">Display Date:</label><br>
-                <input type="date" id="display-data" name="display-date" min="2016-01-01"><br>
-                <input type="date" id="display-data" name="display-date" max="2016-01-01"><br>
-                <label for="competitors">Competitors:</label><br>
-                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
-                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
-                <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
-            </form>
-            <br><button type="button" class="btn btn-primary btn-block border border-white rounded">Export</button>
+    <div class="row m-0 p-0">
+        <div class="col-3 p-1 me-3" style="outline: solid 3px black;">
+            <div class="data-filter">
+                <h3 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Data</h3>
+                <form method="post">
+                    <label for="ticker">Filter Ticker</label><br>
+                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /><br>
+                    <label for="display-date">Display Date:</label><br>
+                    <input type="date" id="display-data" name="display-date" min="2016-01-01"><br>
+                    <input type="date" id="display-data" name="display-date"><br>
+                    <label for="statement-selector">Select Financial Data</label>
+                        <select class="form-control" id="statment-selector">
+                            <option value="income_statement">Income Statement</option>
+                            <option value="balance_sheet">Balanace Sheet</option>
+                            <option value="cash_flows">Cash Flows</option>
+                            <option value="financials">Key Metrics</option>
+                        </select>
+                    <br><button type="button" class="btn btn-primary btn-block border border-white rounded" style="background-color: #DC4405 !important;">Submit</button><br>
+                </form>
+            </div>
+            
+            <div class="export-workbook">
+                <h3 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Export Workbook</h3>
+                <form>
+                    <label for="ticker">Filter Ticker</label><br>
+                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /><br>
+                    <label for="display-date">Display Date:</label><br>
+                    <input type="date" id="display-data" name="display-date" min="2016-01-01"><br>
+                    <input type="date" id="display-data" name="display-date" max="2016-01-01"><br>
+                    <label for="competitors">Competitors:</label><br>
+                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
+                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
+                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
+                </form>
+                <br><button type="button" class="btn btn-primary btn-block border border-white rounded" style="background-color: #DC4405 !important;">Export</button>
 
+            </div>
         </div>
+    
+        {% block stockContent %}{% endblock stockContent %}
     </div>
-
-    {% block stockContent %}{% endblock stockContent %}
     <!--
 
     <div class="data col-md-8 w-75 h-100" style="padding: 10px; outline: solid 3px black;">
