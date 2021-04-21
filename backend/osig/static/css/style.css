@@ -10,6 +10,10 @@ header {
     background: #bbbbbb;
 }
 
+.footer {
+    background-color: #DC4405 !important;
+}
+
 nav {
     height: 100px;
 }
@@ -39,7 +43,6 @@ nav {
     top: 125px;
     left: 25px;
     right: 25px;
-    bottom: 0;
     margin-bottom: 30px;
     display: flex;
     /*outline: solid 3px black; */
@@ -84,9 +87,6 @@ nav {
 
 h3, h2 {
     background-color: #DC4405 !important;
-    padding: 10px;
-    border-radius: 10px;
-    color: white;
 }
 
 button {
