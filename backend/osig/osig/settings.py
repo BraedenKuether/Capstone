@@ -75,10 +75,7 @@ TEMPLATES = [
 ]
 
 
-REST_FRAMEWORK = {
-
-}
-
+  )
 WSGI_APPLICATION = 'osig.wsgi.application'
 
 

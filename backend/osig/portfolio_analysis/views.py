@@ -8,11 +8,11 @@ from django.http import HttpResponse
 from django.template import Context, loader
 from django.http import JsonResponse
 
+from django.contrib.auth.decorators import permission_required 
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.decorators import api_view
-from rest_framework.decorators import authentication_classes 
-from rest_framework.decorators import permission_classes
 
 
 from rest_framework import status
@@ -20,6 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from portfolio_analysis.models import AnalysisRun, AnalysisRunSerializer
 from django.core.serializers import serialize
+from django.contrib.auth.decorators import login_required
 
 import pyEX as px
 import json
@@ -34,7 +35,10 @@ def index(request):
   return render(request, 'portfolio_analysis/index.html')
    
 @api_view(['GET'])
+@login_required
+@permission_required('portfolio_analysis.isManager',raise_exception=True)
 def get_run(request,id):
+
   if id == 'all':
     '''
     run = AnalysisRun(title='test',path='runs/1.json')
@@ -62,10 +66,8 @@ def get_run(request,id):
   return JsonResponse(resp)
 
 @api_view(['POST'])
-#@authentication_classes([BasicAuthentication])
-#@permission_classes([IsAuthenticated])
+@permission_required('portfolio_analysis.isManager',raise_exception=True)
 def create_run(request):
-  print('creating run')
   body_unicode = request.body.decode('utf-8')
   body = json.loads(body_unicode)
   tickers = body['tickers'].split(',')
@@ -101,7 +103,6 @@ def create_run(request):
 def handle(job,env):
   if job == "pred":
     return env.trainModel()
-  
   elif job == "alphabeta":
     return env.alphabeta(env.weights)
   
@@ -137,6 +138,6 @@ def handle(job,env):
 
   elif job == 'plotport':
     return env.plotPortfolio()
-  
+
   else:
     return "something is fucked"
