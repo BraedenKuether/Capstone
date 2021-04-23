@@ -7,10 +7,17 @@ from time import gmtime, strftime
 class stock_form(forms.Form):
     current_year = int(strftime("%Y", gmtime()))
     YEAR_CHOICES = [
-        (current_year),
         (current_year-1),
         (current_year-2),
-        (current_year-3)
+        (current_year-3),
+        (current_year-4)
+    ]
+
+    SEC_FORM_CHOICES = [
+        "Income Statement",
+        "Balance Sheet",
+        "Cash Flows",
+        "Key Metrics"
     ]
 
     ticker = forms.RegexField(label=_("Stock Ticker"), max_length=5,
