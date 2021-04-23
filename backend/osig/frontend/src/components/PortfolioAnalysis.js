@@ -15,7 +15,9 @@ class PortfolioAnalysis extends Component {
   }
 
   componentDidMount() {
-    var reqInit = {method: 'GET'};
+    var reqInit = {
+      method: 'GET',
+    };
     var req = new Request(window.location.origin.concat("/api/portfolio_analysis/get_runs/all"), reqInit);
     fetch(req)
       .then(response => response.json())
@@ -60,8 +62,32 @@ class PortfolioAnalysis extends Component {
     }
   }
   
+  getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+  
   submit(values) {
-    var reqInit = {method: 'POST', body: JSON.stringify(values)};
+    let csrftoken = this.getCookie('csrftoken');
+    var reqInit = {
+      method: 'POST', 
+      body: JSON.stringify(values),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFTOKEN': csrftoken
+      },
+    };
     console.log(values);
     let api_endpoint = window.location.origin.concat("/api/portfolio_analysis/create_run");
     console.log("submitting ".concat(api_endpoint));

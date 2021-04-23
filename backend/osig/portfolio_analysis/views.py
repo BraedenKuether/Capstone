@@ -48,7 +48,7 @@ def get_run(request,id):
     serializer = AnalysisRunSerializer(run)
     serializer2 = AnalysisRunSerializer(run2)
     '''
-    runs = AnalysisRun.objects.all()
+    runs = AnalysisRun.objects.all().order_by('-date')
     if len(runs) > 0:
       serializer = json.loads(serialize('json',runs,fields=('id','title','date')))
       data = []
@@ -56,7 +56,6 @@ def get_run(request,id):
         run_formatted = run['fields']
         run_formatted['id'] = run['pk']
         data.append(run_formatted)
-      print(data)
       resp = {'data': data}
     else:
       resp = {'data': []}
@@ -68,8 +67,7 @@ def get_run(request,id):
 @api_view(['POST'])
 @permission_required('portfolio_analysis.isManager',raise_exception=True)
 def create_run(request):
-  body_unicode = request.body.decode('utf-8')
-  body = json.loads(body_unicode)
+  body = request.data
   tickers = body['tickers'].split(',')
   title = body['title']
   try:
@@ -85,11 +83,11 @@ def create_run(request):
   user_environment.setWeights([1/n]*n) 
   results = {}
   #jobs = ["pred", "alphabeta", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "portrisk", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
-  jobs = ["pred", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "portrisk", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
+  jobs = ["pred", "alphabeta", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "portrisk", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
   results['tickers'] = tickers
   for job in jobs:
     results[job] = handle(job,user_environment)
-  
+  print('jobs done')
   run = AnalysisRun(title=title,path='')
   run.save()
   id = run.id
