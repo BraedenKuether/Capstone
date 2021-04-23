@@ -18,26 +18,29 @@ client = pyx.Client(IEX_TOKEN, version="sandbox")
 def index(request):
     return render(request, 'stock_research/base_stock_research.html')
 
+def ticker_submit(request):
+    return
+
 def income_statement(request, ticker):
-    form = client.incomeStatement(ticker, period='annual', last=4, format='json')
+    data = client.incomeStatement(ticker, period='annual', last=4, format='json')
     logger.debug("-----------------------LOGGING INCOME STATEMENT JSON-----------------------")
-    logger.info(json.dumps(form, sort_keys=True, indent=4))
-    return render(request, 'stock_research/income_statement.html', {'form': form})
+    logger.info(json.dumps(data, sort_keys=True, indent=4))
+    return render(request, 'stock_research/income_statement.html', {'data': data})
 
 def balance_sheet(request, ticker):
-    form = client.balanceSheet(ticker, period='annual', last=4, format='json')
+    data = client.balanceSheet(ticker, period='annual', last=4, format='json')
     logger.debug("-----------------------LOGGING BALANCE SHEET JSON-----------------------")
-    logger.info(json.dumps(form, sort_keys=True, indent=4))
-    return render(request, 'stock_research/balance_sheet.html', {'form': form})
+    logger.info(json.dumps(data, sort_keys=True, indent=4))
+    return render(request, 'stock_research/balance_sheet.html', {'data': data})
 
 def cash_flows(request, ticker):
-    form = client.cashFlows(ticker, period='annual', last=4, format='json')
+    data = client.cashFlow(ticker, period='annual', last=4, format='json')
     logger.debug("-----------------------LOGGING CASH FLOWS JSON-----------------------")
-    logger.info(json.dumps(form, sort_keys=True, indent=4))
-    return render(request, 'stock_research/cash_flows.html', {'form': form})
+    logger.info(json.dumps(data, sort_keys=True, indent=4))
+    return render(request, 'stock_research/cash_flows.html', {'data': data})
 
 def financials(request, ticker):
-    form = client.financials(ticker)
+    data = client.financials(ticker)
     logger.debug("-----------------------LOGGING FINANCIALS JSON-----------------------")
-    logger.info(json.dumps(form, sort_keys=True, indent=4))
-    return render(request, 'stock_research/financials.html', {'form': form})
+    logger.info(json.dumps(data, sort_keys=True, indent=4))
+    return render(request, 'stock_research/financials.html', {'data': data})
