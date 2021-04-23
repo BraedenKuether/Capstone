@@ -2,18 +2,16 @@
 
 {% block stockContent %}
 
-    <div class="col p-1" style="outline: solid 3px black;">
-        <h2 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Balance Sheet</h2>
-            <table class="table table-bordered">
-                {% for x in form %}
-                {% for var1, var2 in x.items%}
-                <tr>
-                    <td>{{ var1 }}</td>
-                    <td>{{ var2|floatformat:"-3g" }}</td>
-                </tr>
-                {% endfor %}
-                {% endfor %}
-            </table>
-    </div>
+    <h2 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Balance Sheet</h2>
+        <table class="table table-bordered">
+            {% for x in data %}
+            {% for var1, var2 in x.items%}
+            <tr>
+                <td>{{ var1 }}</td>
+                <td>{{ var2|floatformat:"-3g" }}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </table>
 
 {% endblock stockContent %}
