@@ -8,8 +8,8 @@
 {% block content %}
 
     <div class="row m-0 p-0">
-        <div class="col-3 p-1 me-3" style="outline: solid 3px black;">
-            <div class="data-filter">
+        <div class="col-3 p-0 me-3">
+            <div class="data-filter border border-2 border-dark rounded p-1">
                 <h3 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Data</h3>
                 <form method="post">
                     <label for="ticker">Filter Ticker</label><br>
@@ -28,7 +28,7 @@
                 </form>
             </div>
             
-            <div class="export-workbook">
+            <div class="export-workbook border border-2 border-dark rounded p-1 mt-2">
                 <h3 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Export Workbook</h3>
                 <form>
                     <label for="ticker">Filter Ticker</label><br>
@@ -46,7 +46,9 @@
             </div>
         </div>
     
-        {% block stockContent %}{% endblock stockContent %}
+        <div class="col border border-2 border-dark rounded p-1">
+            {% block stockContent %}{% endblock stockContent %}
+        </div>
     </div>
     <!--
 
