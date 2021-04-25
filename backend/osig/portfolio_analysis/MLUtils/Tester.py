@@ -172,6 +172,7 @@ class Tester:
       returns:
         (float,float) of variance and std
     '''
+    weights = np.array(weights)
     closes = [x['close'] for x in self.portfolio.assetsByTime]
     catted = pd.concat(closes,axis=1)
     dailyReturns = catted.pct_change()
@@ -225,9 +226,11 @@ class Tester:
 
     returns = closes.pct_change()[1:]
     returns = returns.dot(weights)
-
+    
+    print(len(returns))
     benchMark = client.chartDF(market,timeframe='5y')['close'].pct_change()[1:]
-
+    benchMark = benchMark[:len(returns)]
+    print(len(benchMark))
     beta,alpha = stats.linregress(benchMark.values,returns.values)[0:2]
             
     if withPlot:
@@ -415,7 +418,7 @@ ts = Tester(p,5,2)
 
 print(ts.topbottom([.25,.25,.25,.25]))
 '''
-stonks = ['vti', 'agg', 'dbc', 'vixy']
+#stonks = ['vti', 'agg', 'dbc', 'vixy']
 #stonks = ['amd','wfc','ge','aapl','aal','hog','f','bac','t','intc']
 #stonks = ['adbe', 'atvi', 'axon', 'blk', 'bx', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
 #stonks = ['adbe', 'atvi', 'blk', 'cost', 'crm', 'csco', 'cvs', 'dis', 'dpz', 'googl', 'hd', 'hon', 'jnj', 'jpm', 'lmt', 'mdt', 'nee', 'pxd', 'pypl', 'sbux', 'stz', 'swks', 't', 'twtr', 'usb', 'zts']
@@ -423,10 +426,9 @@ stonks = ['vti', 'agg', 'dbc', 'vixy']
 '''
 p = P.Portfolio(stonks,client)
 ts = Tester(p,5,2)
-ts.plotPortfolio()
-ts.cumulativeReturns([1.0/len(stonks)]*len(stonks))
-'''
-'''
+ts.alphabeta([.25,.25,.25,.25])
+
+
 try:
   p = P.Portfolio(stonks,client,earnings=False)
 except SymbolError:
