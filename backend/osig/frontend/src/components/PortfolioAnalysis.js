@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik';
 import {ResponsiveLine} from '@nivo/line';
 
 class PortfolioAnalysis extends Component {
@@ -10,7 +10,9 @@ class PortfolioAnalysis extends Component {
       data: [],
       loaded: false,
       placeholder: "Loading",
-      runs: []
+      runs: [],
+      errorMsg: '',
+      successMsg: ''
     };
   }
 
@@ -79,6 +81,10 @@ class PortfolioAnalysis extends Component {
   }
   
   submit(values) {
+    this.setState({
+      errorMsg: '',
+      successMsg: ''
+    });
     let csrftoken = this.getCookie('csrftoken');
     var reqInit = {
       method: 'POST', 
@@ -88,15 +94,29 @@ class PortfolioAnalysis extends Component {
         'X-CSRFTOKEN': csrftoken
       },
     };
-    console.log(values);
     let api_endpoint = window.location.origin.concat("/api/portfolio_analysis/create_run");
     console.log("submitting ".concat(api_endpoint));
     var req = new Request(api_endpoint, reqInit);
     fetch(req)
-      .then(response => response.text())
-      .then(data => {
-        this.componentDidMount();
-    })
+      .then(response => {
+        if(response.status == 400) {
+          response.text().then(data => {
+            this.setState({
+              errorMsg: data,
+              successMsg: ''
+            });
+            this.componentDidMount();
+          })
+        } else {
+          response.text().then(data => {
+            this.setState({
+              errorMsg: '',
+              successMsg: data
+            });
+            this.componentDidMount();
+          })
+        }
+      })
   }
 
   render() {
@@ -105,41 +125,69 @@ class PortfolioAnalysis extends Component {
         <h1>Portfolio Analysis</h1>
         <Formik
          initialValues={{ 
-          tickers: '', 
-          title: ''
+          tickers: [],
+          title: '',
+          numTickers:0,
          }}
          validate={values => {
            const errors = {};
-           if (!values.tickers) {
-             errors.tickers = 'Required';
-           }
+           
+           
            if (!values.title) {
              errors.title = 'Required';
            }
+           console.log(errors)
            return errors;
          }}
         onSubmit={(values, { setSubmitting }) => {
                  this.submit(values)
                  setSubmitting(false);
          }}>
-        {props => (
+         {(props, setValues ) => (
           <Form onSubmit={props.handleSubmit}>
             <div>
-              <label style={{ display: "block" }}>Tickers</label>
-              <Field
-               type="text"
-               name="tickers"
-               id="tickers"
-               placeholder="Enter your tickers separated by commas"
-               onChange={props.handleChange}
-               onBlur={props.handleBlur}
-               value={props.values.tickers}
-               />
-              <ErrorMessage
-                component="div"
-                name="tickers"
-                className="invalid-feedback"
-              />
+            <FieldArray
+             name="tickers"
+             render={arrayHelpers => (
+                <div>
+                  {props.values.tickers && props.values.tickers.length > 0 ? (
+                    props.values.tickers.map((ticker, index) => (
+                      <div key={index}>
+                        <div>
+                        <label>Ticker Name</label>
+                        <Field 
+                        type = "text"
+                        name={`tickers.${index}.name`} />
+                        </div>
+                        <div>
+                        <label>Weighting in Portfolio</label>
+                        <Field 
+                        type = "float"
+                        name={`tickers.${index}.weight`} />
+                        </div>
+                        <button
+                         type="button"
+                         onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
+                        >
+                        -
+                        </button>
+                        <button
+                         type="button"
+                         onClick={() => arrayHelpers.insert(index, '')} // insert an empty string at a position
+                        >
+                        +
+                        </button>
+                     </div>
+                   ))
+                 ) : (
+                   <button type="button" onClick={() => arrayHelpers.push('')}>
+                     {/* show this when user has removed all friends from the list */}
+                     Add a Ticker
+                   </button>
+                 )}
+                </div>
+             )}
+             />
               <label>Title</label>
               <Field
                type="text"
@@ -161,6 +209,12 @@ class PortfolioAnalysis extends Component {
         )
         }
         </Formik>
+        <div style={{color: 'red'}}>
+          {this.state.errorMsg}
+        </div>
+        <div style={{color: 'green'}}>
+          {this.state.successMsg}
+        </div>
         {this.state.loaded &&
           <div>
           <h1 id='title'>Previous Runs</h1>

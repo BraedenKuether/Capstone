@@ -3,6 +3,7 @@ from django.shortcuts import render
 from .MLUtils import Tester as T
 from .MLUtils import Portfolio as P
 from .MLUtils.Trainer import *
+from .MLUtils.Errors import *
 # Create your views here.
 from django.http import HttpResponse
 from django.template import Context, loader
@@ -48,7 +49,7 @@ def get_run(request,id):
     serializer = AnalysisRunSerializer(run)
     serializer2 = AnalysisRunSerializer(run2)
     '''
-    runs = AnalysisRun.objects.all().order_by('-date')
+    runs = AnalysisRun.objects.all().order_by('-id')
     if len(runs) > 0:
       serializer = json.loads(serialize('json',runs,fields=('id','title','date')))
       data = []
@@ -68,7 +69,17 @@ def get_run(request,id):
 @permission_required('portfolio_analysis.isManager',raise_exception=True)
 def create_run(request):
   body = request.data
-  tickers = body['tickers'].split(',')
+  tickers = []
+  weights = []
+  for ticker in body['tickers']:
+    tickers.append(ticker['name'])
+    try:
+      weights.append(float(ticker['weight']))
+    except ValueError:
+      return HttpResponse('Invalid number for weights', status=400)
+  
+  if sum(weights) < 0.999 or sum(weights) > 1.0001:
+    return HttpResponse('Weights do not add up to 1', status=400)
   title = body['title']
   try:
     p = P.Portfolio(tickers,client,earnings=True)
@@ -79,8 +90,9 @@ def create_run(request):
 
   global user_environment
   user_environment = T.Tester(p,10,60,train_func = train_net_earnings)
-  n = len(tickers)
-  user_environment.setWeights([1/n]*n) 
+  #n = len(tickers)
+  #user_environment.setWeights([1/n]*n)
+  user_environment.setWeights(weights)
   results = {}
   #jobs = ["pred", "alphabeta", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "portrisk", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]
   jobs = ["pred", "alphabeta", "cumreturns", "topbottomperf", "totalperf", "ytdperf", "spytd", "portrisk", "sharperatio", "priceearnings", "dividendyield", "priceshares", "plotport"]

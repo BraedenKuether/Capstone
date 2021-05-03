@@ -21,7 +21,6 @@ class Portfolio:
                           'shortTermInvestments', 'totalAssets', 'totalCurrentLiabilities', 'totalLiabilities']
       self.num_earnings_features = len(earnings_feats) * self.numAssets
       for i,asset in enumerate(assets):
-
         try:
           df = client.balanceSheetDF(asset, period='quarter', last = 12).sort_index()[earnings_feats]
         except p.common.PyEXception as e:
@@ -42,7 +41,6 @@ class Portfolio:
     m = float('inf')
     tmp = []
     for a in assets:
-
       try:
           data = self.stockDF(self.client,a).sort_values(by = 'date')
       except p.common.PyEXception as e:
