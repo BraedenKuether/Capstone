@@ -12,7 +12,8 @@ class PortfolioAnalysis extends Component {
       placeholder: "Loading",
       runs: [],
       errorMsg: '',
-      successMsg: ''
+      successMsg: '',
+      submitting: ''
     };
   }
 
@@ -83,7 +84,8 @@ class PortfolioAnalysis extends Component {
   submit(values) {
     this.setState({
       errorMsg: '',
-      successMsg: ''
+      successMsg: '',
+      submitting: 'Submitting...'
     });
     let csrftoken = this.getCookie('csrftoken');
     var reqInit = {
@@ -99,11 +101,12 @@ class PortfolioAnalysis extends Component {
     var req = new Request(api_endpoint, reqInit);
     fetch(req)
       .then(response => {
-        if(response.status == 400) {
+        if(response.status != 200) {
           response.text().then(data => {
             this.setState({
               errorMsg: data,
-              successMsg: ''
+              successMsg: '',
+              submitting: ''
             });
             this.componentDidMount();
           })
@@ -111,7 +114,8 @@ class PortfolioAnalysis extends Component {
           response.text().then(data => {
             this.setState({
               errorMsg: '',
-              successMsg: data
+              successMsg: data,
+              submitting: ''
             });
             this.componentDidMount();
           })
@@ -214,6 +218,9 @@ class PortfolioAnalysis extends Component {
         </div>
         <div style={{color: 'green'}}>
           {this.state.successMsg}
+        </div>
+        <div>
+          {this.state.submitting}
         </div>
         {this.state.loaded &&
           <div>
