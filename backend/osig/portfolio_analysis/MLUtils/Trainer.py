@@ -16,7 +16,7 @@ import sys
 #client = px.Client(token,version="sandbox")
 IEX_TOKEN = "Tpk_647cd93d6c5842d6978e55c6f79b0e1a"
 client = px.Client(IEX_TOKEN, version="sandbox")
-
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 torch.set_default_tensor_type('torch.FloatTensor')
@@ -37,8 +37,8 @@ def sharpe_loss(weights, returns):
   
   
 def train_net(net,batches,epochs):
-  #net = Net(numFeatures,numAssets,timePeriod).to('cuda')
-  net = net.double().to('cuda')
+  #net = Net(numFeatures,numAssets,timePeriod).to(DEVICE)
+  net = net.double().to(DEVICE)
   optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
   loss_fn = sharpe_loss
   lossVs = [] 
@@ -48,8 +48,8 @@ def train_net(net,batches,epochs):
     if e % 10 == 0:
       print(e)
     for X,y,_,_ in batches:
-      X = X.to('cuda')
-      y = y.to('cuda')
+      X = X.to(DEVICE)
+      y = y.to(DEVICE)
       optimizer.zero_grad()
       out = net.forward(X)
       loss = loss_fn(out,y)     
@@ -64,8 +64,8 @@ def train_net_earnings(net,batches,epochs):
   #print(d)
   overall_val = 1
   start_day = 0
-  #net = NetWithEarnings(numFeatures,d.NUM_EARNINGS_FEATURES,numAssets,timePeriod).to('cuda')
-  net = net.double().to('cuda')
+  #net = NetWithEarnings(numFeatures,d.NUM_EARNINGS_FEATURES,numAssets,timePeriod).to(DEVICE)
+  net = net.double().to(DEVICE)
   losses_new_net = []
   optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
   loss_fn = sharpe_loss
@@ -77,9 +77,9 @@ def train_net_earnings(net,batches,epochs):
     epoch_loss = 0
     #("step {}".format(i))
     for X,y,earnings,_,_ in batches:
-      X = X.double().to('cuda')
-      y = y.double().to('cuda')
-      earnings = earnings.double().to('cuda')
+      X = X.double().to(DEVICE)
+      y = y.double().to(DEVICE)
+      earnings = earnings.double().to(DEVICE)
       out = net.forward(X, earnings)
 
       '''
@@ -121,8 +121,8 @@ def validation_set(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   losses_dates = []
   for X,y,dates,future_date in batches:
     with torch.no_grad():
-      X = X.double().to('cuda')
-      y = y.double().to('cuda')
+      X = X.double().to(DEVICE)
+      y = y.double().to(DEVICE)
       out = net.forward(X)
       if simulation_day == 0:
         #print("input:", testing_d[i])
@@ -146,7 +146,7 @@ def validation_set(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   
   print(len(batches[-1]))
   last_x, _, _, _ = batches[-1]
-  last_x = last_x.double().to('cuda')
+  last_x = last_x.double().to(DEVICE)
   weights = net.forward(last_x)[-1][-1].view(NUM_ASSETS)
   weights = weights.tolist()
   return x,y_graph,losses,losses_dates, weights
@@ -163,9 +163,9 @@ def validation_set_earnings(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   losses_dates = []
   for X,y,earnings,dates,future_date in batches:
     with torch.no_grad():
-      X = X.double().to('cuda')
-      y = y.double().to('cuda')
-      earnings = earnings.double().to('cuda')
+      X = X.double().to(DEVICE)
+      y = y.double().to(DEVICE)
+      earnings = earnings.double().to(DEVICE)
       out = net.forward(X, earnings)
       if simulation_day == 0:
         returns = y[-1][-1]
@@ -187,8 +187,8 @@ def validation_set_earnings(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
       
   print(len(batches[-1]))
   last_x, _, last_earnings, _, _ = batches[-1]
-  last_x = last_x.double().to('cuda')
-  last_earnings = last_earnings.double().to('cuda')
+  last_x = last_x.double().to(DEVICE)
+  last_earnings = last_earnings.double().to(DEVICE)
   weights = net.forward(last_x, last_earnings)[-1][-1].view(NUM_ASSETS)
   weights = weights.tolist()
   return x,y_graph,losses,losses_dates, weights
