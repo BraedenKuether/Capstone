@@ -41,7 +41,7 @@ class Tester:
   def setWeights(self,weights):
     self.weights = weights
     
-  def cumulativeReturns(self,weights,s=slice(None),withPlot=True):
+  def cumulativeReturns(self,weights,s=None,withPlot=True):
     '''
       Calculates cumulative returns of the portfolio over a period
       based on the slice, defaults to entire time period, if you 
@@ -55,6 +55,8 @@ class Tester:
       returns:
         json object representation of the line graph
     '''
+    if not s:
+      s = self.validation_slice
 
     closes = [x['close'][s] for x in self.portfolio.assetsByTime]
     catted = pd.concat(closes,axis=1)
@@ -349,7 +351,9 @@ class Tester:
 
   def trainModel(self, epochs = 50):
     train,val,test = self.dataset.split(.8,.9)
+    self.validation_slice = slice(-1*len(test),None,1)
     w, self.net, losses = self.train_func(self.net,train,epochs)
+    
     
     self.losses = losses
     self.epochs = epochs
