@@ -30,3 +30,4 @@ class stock_form(forms.Form):
         help_text=_("Select a year"),
         error_messages={'required': _("Need to enter a year"),}
     )
+    SEC_Choice = forms.ChoiceField(choices=SEC_FORM_CHOICES)

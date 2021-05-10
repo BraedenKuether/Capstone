@@ -1,8 +1,7 @@
-from backend.osig.stock_research.forms import stock_form
 from django.shortcuts import render
 
 # Create your views here.
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, response
 from django.template import Context, loader
 from django.urls import reverse
 import logging
@@ -21,9 +20,16 @@ def index(request):
 
 def ticker_submit(request):
     form = stock_form(request.POST)
-    if form.is_valid():
-        
+    if request.method == 'POST':
+        form = stock_form(request.POST)
+        if form.is_valid():
+            ticker = form.cleaned_data['ticker'].upper()
+            display_years = form.cleaned_data['display_date']
+            sec_choice = form.cleaned_data['SEC_Choice']
+            return response
 
+    return render(request, 'stock_research/income_statement.html', {'form': form})
+        
 def income_statement(request, ticker):
     data = client.incomeStatement(ticker, period='annual', last=4, format='json')
     logger.debug("-----------------------LOGGING INCOME STATEMENT JSON-----------------------")
