@@ -227,10 +227,8 @@ class Tester:
     returns = closes.pct_change()[1:]
     returns = returns.dot(weights)
     
-    print(len(returns))
     benchMark = client.chartDF(market,timeframe='5y')['close'].pct_change()[1:]
     benchMark = benchMark[:len(returns)]
-    print(len(benchMark))
     beta,alpha = stats.linregress(benchMark.values,returns.values)[0:2]
             
     if withPlot:

@@ -1,5 +1,18 @@
 import json
 
+'''
+These classes and functions are for generating the json
+objects needed for graphs if you want to understand them 
+the best way is to just look at the data tab on
+
+https://nivo.rocks/bar/
+https://nivo.rocks/line/
+
+The rest is just code to coax python into doing all the json
+printing for us
+
+'''
+
 class DataPoint:
   def __init__(self,x,y):
     self.x = x
@@ -18,7 +31,15 @@ class Bar:
     self.returnsColor = "hsl(198, 70%, 50%)"
 
 def toLine(dataDict):
-  #dict from names to data
+  '''
+    creates line graph JSON for nivo
+    
+    params:
+      dataDict: dictionary mapping the x value names to list of y values
+    
+    returns:
+      items: list of json objects
+  '''
   items = []
 
   for name in dataDict.keys():
@@ -28,6 +49,15 @@ def toLine(dataDict):
   return items
 
 def toBar(dataDict):
+  '''
+    creates bar graph JSON for nivo
+    
+    params:
+      dataDict: dictionary mapping the x value names to list of y values
+    
+    returns:
+      items: list of json objects
+  '''
   items = []
   for name in dataDict.keys():
     point = Bar(name,dataDict[name]).__dict__

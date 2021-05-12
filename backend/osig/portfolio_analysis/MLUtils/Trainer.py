@@ -37,7 +37,14 @@ def sharpe_loss(weights, returns):
   
   
 def train_net(net,batches,epochs):
-  #net = Net(numFeatures,numAssets,timePeriod).to('cuda')
+  '''
+  trains net using gradient descent
+  returns:
+    weights: array of weights corresponding to each asset
+    net: the model with updated weights from training
+    lossVs: array of per epoch losses
+  '''
+
   net = net.double().to('cuda')
   optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
   loss_fn = sharpe_loss
@@ -59,12 +66,16 @@ def train_net(net,batches,epochs):
     lossVs.append(acc/len(batches))
   return weights,net,lossVs
   
-#def train_net_earnings(d,returns,timePeriod,numAssets,numFeatures,batchSize,epochs):
 def train_net_earnings(net,batches,epochs):
-  #print(d)
+  '''
+    same idea but for the net earnings model
+    returns:
+      weights: array of weights corresponding to each asset
+      net: the model with updated weights from training
+      losses_new_net: array of per epoch losses
+  '''
   overall_val = 1
   start_day = 0
-  #net = NetWithEarnings(numFeatures,d.NUM_EARNINGS_FEATURES,numAssets,timePeriod).to('cuda')
   net = net.double().to('cuda')
   losses_new_net = []
   optimizer = optim.Adam(net.parameters(), lr=1e-6, weight_decay = 0)
@@ -111,6 +122,22 @@ def train_net_earnings(net,batches,epochs):
 
 
 def validation_set(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
+  '''
+    computes the cumulative return of the model over a given time period
+    
+    params:
+      NUM_ASSETS: # assets in the portfolio
+      TIME_PERIOD_LENGTH: # days the returns are computed over
+      batches: daily features,returns,and dates for each asset
+      net: trained model
+    
+    returns:
+      x: array of dates evaluted over
+      y_graph: array of cumulative returns over the time period
+      losses: array of model losses
+      losses_dates: corresponding date labels for losses
+      weights: weights used for model
+  '''
   loss_fn = sharpe_loss
   overall_val = 1
   simulation_day = 0
@@ -152,6 +179,21 @@ def validation_set(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
   return x,y_graph,losses,losses_dates, weights
   
 def validation_set_earnings(batches,net,NUM_ASSETS,TIME_PERIOD_LENGTH):
+  '''
+    same idea as above but is used with a earnings model 
+    params:
+      NUM_ASSETS: # assets in the portfolio
+      TIME_PERIOD_LENGTH: # days the returns are computed over
+      batches: daily features,returns,and dates for each asset
+      net: trained model
+    
+    returns:
+      x: array of dates evaluted over
+      y_graph: array of cumulative returns over the time period
+      losses: array of model losses
+      losses_dates: corresponding date labels for losses
+      weights: weights used for model
+  '''
   loss_fn = sharpe_loss
   overall_val = 1
   simulation_day = 0
