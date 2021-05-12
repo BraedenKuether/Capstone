@@ -7,9 +7,10 @@ and leverages pyTorch. The financial data is provided through the IEX cloud api 
 
 # Django Requirements
 <li> <a href ="https://pypi.org/project/mysqlclient/">mysqlclient</a>
+<li> <a href ="https://www.django-rest-framework.org/#installation">REST framework</a>
   
 # React Requirements
-<li> <a href ="https://github.com/plouc/nivo/">nivo</a>
+<li> run npm install
 
 # Python Requirements
 <li> <a href="https://pytorch.org/get-started/locally/#windows-installation"> pyTorch </a>
