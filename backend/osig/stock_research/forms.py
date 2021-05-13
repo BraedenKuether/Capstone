@@ -11,8 +11,30 @@ SEC_FORM_CHOICES = (
 
 class stock_form(forms.Form):
     ticker = forms.RegexField(label=_("Stock Ticker:"), max_length=5,
-        regex=r'^[A-Za-z0-9]+$',
+        regex=r'^[A-Za-z]+$',
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
     )
     SEC_Choice = forms.ChoiceField(choices=SEC_FORM_CHOICES, label=_("SEC/Financials Choice:"))
+
+class excel_export(forms.Form):
+    ticker = forms.RegexField(label=_("Stock Ticker:"), max_length=5,
+        regex=r'^[A-Za-z]+$',
+        help_text=_("5 characters or fewer is required"),
+        error_messages={'required': _("Entry only accepts letters"),}
+    )
+    competetor1 = forms.RegexField(label=_("Competator 1:"), max_length=5,
+        regex=r'^[A-Za-z]+$',
+        help_text=_("5 characters or fewer is required"),
+        error_messages={'required': _("Entry only accepts letters"),}
+    )
+    competetor2 = forms.RegexField(label=_("Competator 2:"), max_length=5,
+        regex=r'^[A-Za-z]+$',
+        help_text=_("5 characters or fewer is required"),
+        error_messages={'required': _("Entry only accepts letters"),}
+    )
+    competetor3 = forms.RegexField(label=_("Competator 3:"), max_length=5,
+        regex=r'^[A-Za-z]+$',
+        help_text=_("5 characters or fewer is required"),
+        error_messages={'required': _("Entry only accepts letters"),}
+    )
