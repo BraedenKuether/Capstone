@@ -25,7 +25,7 @@ SECRET_KEY = '0yytd&#aq*iu6)jsixlbbacv2ib72f5mdq!7l0zevzj1vj28zy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['44.192.88.115','127.0.0.1']
 
 
 # Application definition
@@ -33,12 +33,17 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'home_page.apps.HomePageConfig',
     'stock_research.apps.StockResearchConfig',
+	'portfolio_analysis.apps.PortfolioAnalysisConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'frontend',
+    'accounts',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -56,7 +61,7 @@ ROOT_URLCONF = 'osig.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [str(BASE_DIR.joinpath('templates'))],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,6 +74,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'osig.wsgi.application'
 
 
@@ -77,11 +83,14 @@ WSGI_APPLICATION = 'osig.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dbmaster',
+        'HOST': 'ls-a62449c6a9269d6299b0926073c1490836c081f4.cici8ggcf7ry.us-west-2.rds.amazonaws.com',
+        'PORT': '3306',
+        'USER': 'capstone',
+        'PASSWORD': 'F%z,N;?v1$,buo.]sKj%oxx(*LK5DVe+',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -120,3 +129,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+LOGIN_REDIRECT_URL = '/home_page'
