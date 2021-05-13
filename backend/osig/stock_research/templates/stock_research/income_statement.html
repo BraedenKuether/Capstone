@@ -2,8 +2,11 @@
 
 {% block stockContent %}
 
-    <h2 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Income Statement</h2>
-        <table class="table table-bordered">
+    <table class="table table-bordered table-striped align-middle" style="margin-bottom: 0px !important; background-color: white !important; width: 100%;">
+        <thead>
+            <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px;">Income Statement</div></tr>
+        </thead>
+        <tbody>
             {% for x in data %}
             {% for var1, var2 in x.items%}
             <tr>
@@ -12,6 +15,7 @@
             </tr>
             {% endfor %}
             {% endfor %}
-        </table>
+        </tbody>
+    </table>
 
 {% endblock stockContent %}

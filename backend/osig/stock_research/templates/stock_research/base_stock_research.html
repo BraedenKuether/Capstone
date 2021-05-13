@@ -8,49 +8,103 @@
 {% block content %}
 
     <div class="row m-0 p-0">
-        <div class="col-3 p-0 me-3">
-            <div class="data-filter border border-2 border-dark rounded p-1">
-                <h3 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Data</h3>
+        <div class="col-3 p-0 me-3" style="margin-bottom: 0px">
+            <div class="data-filter border border-4 border-dark p-1" style="padding: 0px !important; margin-right: 0px; background-color: #DC4405 !important;">
                 <form method="post">
-                    <label for="ticker">Filter Ticker</label><br>
-                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /><br>
-                    <label for="display-date">Display Date:</label><br>
-                    <input type="date" id="display-data" name="display-date" min="2016-01-01"><br>
-                    <input type="date" id="display-data" name="display-date"><br>
-                    <label for="statement-selector">Select Financial Data</label>
-                        <select class="form-control" id="statment-selector">
-                            <option value="income_statement">Income Statement</option>
-                            <option value="balance_sheet">Balanace Sheet</option>
-                            <option value="cash_flows">Cash Flows</option>
-                            <option value="financials">Key Metrics</option>
-                        </select>
-                    <br><button type="button" class="btn btn-primary btn-block border border-white rounded" style="background-color: #DC4405 !important;">Submit</button><br>
+                    <table class="table table-bordered align-middle" style="margin-bottom: 0px !important; background-color: white !important; width: 100%;">
+                        <thead>
+                            <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px; color">Data</div></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><label for="ticker">Filter Ticker</label></td>
+                                <td><input type="text" id="ticker" name="ticker" maxlength="4" style="width:100%" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="statement-selector">View</label></td>
+                                <td><select class="form-control" id="statment-selector">
+                                    <option value="income_statement">Income Statement</option>
+                                    <option value="balance_sheet">Balanace Sheet</option>
+                                    <option value="cash_flows">Cash Flows</option>
+                                    <option value="financials">Key Metrics</option>
+                                    <option value="graph">Graph</option>
+                                </select></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-grid mx-auto"><button type="button" class="btn btn-block" style="background-color: #DC4405 !important; margin: 5px">Submit</button></div>
                 </form>
             </div>
-            
-            <div class="export-workbook border border-2 border-dark rounded p-1 mt-2">
-                <h3 class="border border-white rounded text-center text-white p-1" style="background-color: #DC4405 !important;">Export Workbook</h3>
-                <form>
-                    <label for="ticker">Filter Ticker</label><br>
-                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /><br>
-                    <label for="display-date">Display Date:</label><br>
-                    <input type="date" id="display-data" name="display-date" min="2016-01-01"><br>
-                    <input type="date" id="display-data" name="display-date" max="2016-01-01"><br>
-                    <label for="competitors">Competitors:</label><br>
-                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
-                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
-                    <input type="text" id="ticker" name="ticker" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" />
-                </form>
-                <br><button type="button" class="btn btn-primary btn-block border border-white rounded" style="background-color: #DC4405 !important;">Export</button>
 
+            <div class="export-workbook border border-4 border-dark p-1" style="padding: 0px !important; margin-right: 0px; margin-top: 10px; background-color: #DC4405 !important;">
+                <form>
+                    <table class="table table-bordered align-middle" style="margin-bottom: 0px !important; background-color: white !important; width: 100%;">
+                        <thead>
+                            <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px;">Export Workbook</div></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="width:30%"><label for="competitors">Competitor #1</label></td>
+                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="competitors">Competitor #2</label></td>
+                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="competitors">Competitor #3</label></td>
+                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="competitors">Competitor #4</label></td>
+                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="competitors">Competitor #5</label></td>
+                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-grid mx-auto"><button type="button" class="btn btn-block" style="background-color: #DC4405 !important; margin: 5px; color: black">Export</button></div>
+                </form>
+            </div>
+
+            <div class="export-workbook border border-4 border-dark p-1" style="padding: 0px !important; margin-right: 0px; margin-top: 10px; background-color: #DC4405 !important;">
+                <form>
+                    <table class="table table-bordered align-middle" style="margin-bottom: 0px !important; background-color: white !important; width: 100%;">
+                        <thead>
+                            <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px;">Graph Settings</div></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><label for="display-date">Date From</label></td>
+                                <td><div class ="input-group input-daterange"><input type="date" id="display-data" name="display-date" min="2016-01-01" class="form-control datepicker" style><div></td>
+                            </tr>
+                            <tr>
+                                <td><label for="display-date">Date To</label></td>
+                                <td><input type="date" id="display-data" name="display-date" min="2016-01-01" class="form-control datepicker" style></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-grid mx-auto"><button type="button" class="btn btn-block" style="background-color: #DC4405 !important; margin: 5px; color: black">Update</button></div>
+                </form>
             </div>
         </div>
-    
-        <div class="col border border-2 border-dark rounded p-1">
+
+        <div class="col border border-4 border-dark p-1" style="padding: 0px !important; margin-right: 0px; margin-bottom: 24px; background-color: black !important;">
             {% block stockContent %}{% endblock stockContent %}
         </div>
     </div>
     <!--
+
+    <tr>
+        <td><label for="display-date">Date From</label></td>
+        <td><div class ="input-group input-daterange"><input type="date" id="display-data" name="display-date" min="2016-01-01" class="form-control datepicker" style><div></td>
+    </tr>
+    <tr>
+        <td><label for="display-date">Date To</label></td>
+        <td><input type="date" id="display-data" name="display-date" min="2016-01-01" class="form-control datepicker" style></td>
+    </tr>
 
     <div class="data col-md-8 w-75 h-100" style="padding: 10px; outline: solid 3px black;">
         <h2 style="text-align: center;">Income Statement</h2>

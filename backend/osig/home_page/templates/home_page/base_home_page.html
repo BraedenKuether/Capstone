@@ -1,4 +1,4 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% load i18n %}
 
 {% block title %}Home{% endblock title %}
@@ -6,21 +6,73 @@
 {% block nav-home %}<a class="nav-link active" aria-current="page" href="{% url 'home_page' %}">Home</a>{% endblock nav-home %}
 
 {% block content %}
+<div class="row" style="height: 500 !important;">
+    <div class="col-8">
+        <iframe
+          id="calendar"
+          src="https://calendar.google.com/calendar/embed?src=oregonstate.edu_h8k929p1os2a1308crm54q8ihg%40group.calendar.google.com&ctz=America%2FLos_Angeles"
+          style="border: 0"
+          height="100%"
+          width="100%"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+    </div>
 
-<iframe
-  id="calendar"
-  src="https://calendar.google.com/calendar/embed?src=oregonstate.edu_h8k929p1os2a1308crm54q8ihg%40group.calendar.google.com&ctz=America%2FLos_Angeles"
-  style="border: 0"
-  width="600"
-  height="400"
-  frameborder="0"
-  scrolling="no"
-></iframe>
-
-<div id="resources">
-  <h1>Resources</h1>
-  <ul>
-    <li>Stocks</li>
-  </ul>
-</div>
+    <div class="col-4" id="resources">
+      <div class="border border-4 border-dark p-1" style="padding: 0px !important; margin-right: 0px; background-color: black !important;">
+            <table class="table table-bordered align-middle" style="margin-bottom: 0px !important; background-color: white !important; width: 100%;">
+                <thead>
+                      <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px; color">Resources</div></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="width: 50%;">OSIG Website</td>
+                        <td><a href="https://www.oregonstateinvestmentgroup.com/" target="_blank">link</a></td>
+                    </tr>
+                    <tr>
+                        <td>Box Home</td>
+                        <td><a href="https://oregonstate.app.box.com/folder/67126758553?s=1gred7wfd4zrigao6e23dht8l7y4z50j" target="_blank">link</a></td>
+                    </tr>
+                    <tr>
+                        <td>Box Minutes</td>
+                        <td><a href="https://oregonstate.app.box.com/folder/67161730516" target="_blank">link</a></td>
+                    </tr>
+                    <tr>
+                        <td>Box Pitches</td>
+                        <td><a href="https://oregonstate.app.box.com/folder/67127152452" target="_blank">link</a></td>
+                    </tr>
+                    <tr>
+                        <td>Box Portfolios</td>
+                        <td><a href="https://oregonstate.app.box.com/folder/67127592025" target="_blank">link</a></td>
+                    </tr>
+                    <tr>
+                        <td>SEC EDGAR</td>
+                        <td><a href="https://www.sec.gov/edgar/searchedgar/companysearch.html" target="_blank">link</a></td>
+                    </tr>
+                    <tr>
+                        <td>Workbook Template</td>
+                        <td><a href="https://oregonstate.app.box.com/file/738659285616" target="_blank">link</a></td>
+                    </tr>
+                    <tr>
+                        <td>Daily Treasury Yields</td>
+                        <td><a href="https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/textview.aspx?data=yield" target="_blank">link</a></td>
+                    </tr>
+                    <tr>
+                        <td>Country Risk Premiums</td>
+                        <td><a href="http://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/ctryprem.html" target="_blank">link</a></td>
+                    </tr>
+                </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
 {% endblock content %}
+
+    <!--
+
+    width="600"
+    height="400"
+
+
+  -->
