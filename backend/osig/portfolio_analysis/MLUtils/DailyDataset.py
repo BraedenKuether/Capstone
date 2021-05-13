@@ -8,7 +8,19 @@ torch.set_default_tensor_type('torch.cuda.FloatTensor')
 class DailyDataset:
 
   def __init__(self,features,assetsByTime,bSize,numAssets,numFeatures,timePeriod,transformer=False,forecast=False,earnings=None,num_earning_feats = None,dates=None):
+    '''
+      batches the data set up 
 
+      params:
+        features: tensors containg the features for each asset
+        assetsBytime: pandas datafram containing the features for each asset indexed by time
+        bSize: batch size
+        timePeriod: the length of the time period that we are evaluating over
+        transformer: implemented but not used flips first and second axes for batches
+        forecast: use for forecasting timePeriod days into the future
+        earnings: array of earnings info
+        dates: associated dates for earnings
+    '''
     self.time = timePeriod
     self.transformer = transformer
     self.forecast = forecast
@@ -20,7 +32,8 @@ class DailyDataset:
     X = features
     if self.forecast:
       X = X[:-timePeriod]
-
+    
+    # normalize features
     minx = torch.min(X,0).values
     maxx = torch.max(X,0).values
     X = (X-minx)/(maxx-minx)
@@ -33,6 +46,15 @@ class DailyDataset:
 
  
   def getPctChange(self,assetsByTime):
+    '''
+      computes the daily percentage change in the retunrs for each asset
+      
+      params:
+        assetsByTime: pandas DF of features for each asset indexed by time
+
+      returns:
+        tensor of percentage change for each asset
+    '''
     change = []
     if self.forecast:
       period = self.time
@@ -48,6 +70,18 @@ class DailyDataset:
     return torch.cat(change,1)
 
   def split(self,train,val):
+    '''
+      splits the dataset up into train val test
+      data set is broken up as 1*train + 1*val + 1*(1-train-val)
+      i.e for 80 10 10 split call
+      split(.8,.1)
+      the sum must add up to one or else it will break
+      params:
+        train,val: floats 
+
+      returns:
+        train,val,test: tensors of data
+    '''
     trainL = int(len(self.X)*train) 
     valL = int(len(self.X)*val)
     
@@ -63,6 +97,18 @@ class DailyDataset:
     return train,val,test
 
   def makeBatch(self,d, earnings=None,dates=None):
+    '''
+      batches up the features into tensors
+
+      params:
+        d: tensor of featurized assets
+        earnings: array of earnings info
+        dates: array of dates
+
+      returns:
+        X: tensor containing features for each asset
+        y: tensor containing returns for each asset
+    '''
     xs = []
     ys = []
     

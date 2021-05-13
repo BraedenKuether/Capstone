@@ -2,7 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class Net(nn.Module):
+class Net(nn.Module): 
+    '''
+      vanilla net meant to be used for assets that do not have any financial data
+      LSTM -> Full Connected -> Softmax 
+    '''
     def __init__(self,NUM_FEATURES,NUM_ASSETS,TIME_PERIOD_LENGTH):
         super(Net, self).__init__()
         self.time = TIME_PERIOD_LENGTH
@@ -14,15 +18,19 @@ class Net(nn.Module):
         # x : batch_len X self.time X NUM_FEATURES
         x, (hn, cn) = self.input(x)
         # batch X time x assets*time
-        #print(x.shape)
         x = self.lin(x)
-        #print(x.shape)
         x = self.soft_out(x)
-        #print(x.shape)
-        #print(x)
         return x
 
 class NetWithEarnings(nn.Module):
+  '''
+    net made to handle assets for which we have both daily data as well as more sophisticated
+    financials. We needed two nets because the financial data is spread out over much different
+    timespans (months/years) and we thought this was the simpliest fix we could come up with.
+
+    You can basically think of this as doing the same thing as the other net but for two different types of data
+    and then concatenating them together at the very end.
+  '''
   def __init__(self,NUM_FEATURES,NUM_EARNING_FEATURES,NUM_ASSETS,TIME_PERIOD_LENGTH):
     super(NetWithEarnings, self).__init__()
     self.time = TIME_PERIOD_LENGTH
