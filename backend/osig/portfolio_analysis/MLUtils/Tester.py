@@ -56,7 +56,7 @@ class Tester:
         json object representation of the line graph
     '''
     if not s:
-      s = self.validation_slice
+      s = self.validation_slice = slice(-90,None,1)
 
     closes = [x['close'][s] for x in self.portfolio.assetsByTime]
     catted = pd.concat(closes,axis=1)
@@ -351,7 +351,6 @@ class Tester:
 
   def trainModel(self, epochs = 50):
     train,val,test = self.dataset.split(.8,.9)
-    self.validation_slice = slice(-1*len(test),None,1)
     w, self.net, losses = self.train_func(self.net,train,epochs)
     
     
