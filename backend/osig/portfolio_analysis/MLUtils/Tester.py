@@ -56,7 +56,7 @@ class Tester:
         json object representation of the line graph
     '''
     if not s:
-      s = self.validation_slice = slice(-90,None,1)
+      s = self.validation_slice = slice(-94,None,1)
 
     closes = [x['close'][s] for x in self.portfolio.assetsByTime]
     catted = pd.concat(closes,axis=1)
