@@ -15,7 +15,7 @@ class stock_form(forms.Form):
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
     )
-    SEC_Choice = forms.ChoiceField(choices=SEC_FORM_CHOICES, label=_("SEC/Financials Choice:"))
+    SEC_Choice = forms.ChoiceField(choices=SEC_FORM_CHOICES, label=_("Form Choice:"))
 
 class excel_export(forms.Form):
     ticker = forms.RegexField(label=_("Stock Ticker:"), max_length=5,
