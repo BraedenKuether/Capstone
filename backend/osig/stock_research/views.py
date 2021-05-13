@@ -1,12 +1,16 @@
 from django.shortcuts import render
 
 # Create your views here.
-from django.http import HttpResponse, HttpResponseRedirect, response
+import os
+from django.http import HttpResponse, HttpResponseRedirect, response, Http404
 from django.template import Context, context, loader
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 import logging
+from zipfile import ZipFile
 from .forms import stock_form, excel_export
+from .SECScraper import createZip
 
 import pyEX as pyx
 import json
@@ -72,3 +76,13 @@ def excel_workbook(request):
         form2 = excel_export()
 
     return render(request, 'stock_research/base_stock_research.html', {'form2': form2})
+
+@csrf_exempt
+def download(request, path):
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/zip")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response
+    raise Http404
