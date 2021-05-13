@@ -2,6 +2,8 @@ import urllib.request
 import urllib
 from urllib.error import HTTPError
 
+#Paremeters: def fucntion_name(ticker, cik)
+
 #Select the ticker and destination file
 ticker = ""
 dest = "C:/Users/Braeden Kuether/Desktop/template_test/"
