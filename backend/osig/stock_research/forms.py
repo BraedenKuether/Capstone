@@ -38,3 +38,13 @@ class excel_export(forms.Form):
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
     )
+    competetor4 = forms.RegexField(label=_("Competator 3:"), max_length=5,
+        regex=r'^[A-Za-z]+$',
+        help_text=_("5 characters or fewer is required"),
+        error_messages={'required': _("Entry only accepts letters"),}
+    )
+    competetor5 = forms.RegexField(label=_("Competator 3:"), max_length=5,
+        regex=r'^[A-Za-z]+$',
+        help_text=_("5 characters or fewer is required"),
+        error_messages={'required': _("Entry only accepts letters"),}
+    )
