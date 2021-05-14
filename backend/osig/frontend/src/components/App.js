@@ -16,7 +16,6 @@ class App extends Component {
     return (
     <Router>
         <Switch>
-            <Route exact path="/" component={Graph} />
             <Route exact path="/portfolio_analysis" component={PortfolioAnalysis} />
             <Route path="/portfolio_analysis/view_run" component={RunView} />
         </Switch>
