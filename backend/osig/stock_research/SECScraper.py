@@ -144,5 +144,3 @@ def createZip(cik, filename, competitors):
     filename = filename + ".zip"
     dirct = os.path.join(dest, filename)
     return dirct
-
-createZip('40545', "test", 0)
