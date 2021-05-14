@@ -13,13 +13,13 @@ import os
 #                       os.path.relpath(os.path.join(root, file),
 #                                       os.path.join(path, "..")))
 
-def createZip(ticker, cik, filename, competitors):
+def createZip(cik, filename, competitors):
 
     #Select the ticker and destination file
     #ticker = ""
-    dest = Path.cwd() + "/downloads"
-    dir = os.path.join(dest, filename)
-    os.mkdir(dir)
+    dest = os.path.join(Path.cwd(), "downloads")
+    dirct = os.path.join(dest, filename)
+    os.mkdir(dirct)
 
     #CIK from JSON response
     #cik = "858877"
@@ -33,17 +33,18 @@ def createZip(ticker, cik, filename, competitors):
     secSearchTenK = "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=" + fullCik + "&type=10-K&dateb=&owner=exclude&count=10&search_text="
     secSearchTenQ = "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=" + fullCik + "&type=10-Q&dateb=&owner=exclude&count=10&search_text="
 
+    print(secSearchTenK)
     #Get 10-K html as a string
-    fp = urllib.request.urlopen(secSearchTenK)
-    myBytes = fp.read()
+    opener = urllib.request.URLopener()
+    opener.addheader('User-Agent', 'whatever')
+    fp = urllib.request.Request(secSearchTenK, headers={'User-Agent': 'Mozilla/5.0'})
+    myBytes = urllib.request.urlopen(fp).read()
     secHtmlTenK = myBytes.decode("utf8")
-    fp.close()
 
     #Get 10-Q html as a string
-    fp = urllib.request.urlopen(secSearchTenQ)
-    myBytes = fp.read()
+    fp = urllib.request.Request(secSearchTenQ, headers={'User-Agent': 'Mozilla/5.0'})
+    myBytes = urllib.request.urlopen(fp).read()
     secHtmlTenQ = myBytes.decode("utf8")
-    fp.close()
 
     #Parts to later build excel download urls
     urlBeg = "https://www.sec.gov/Archives/edgar/data/" + cik + "/"
@@ -76,11 +77,14 @@ def createZip(ticker, cik, filename, competitors):
             url = urlBeg + url + urlEnd
             files.append(url)
 
+    #print(files)
+
     #Get up to 10 years of 10-K data - break upon 404 error
     k = 0
     for f in files:
         try:
-            urllib.request.urlretrieve(files[k], dir + "10-K " + str(k+1) + ".xlsx")
+            temp = os.path.join(dirct, "10-K" + str(k+1) + ".xlsx")
+            opener.retrieve(files[k], temp)
         except HTTPError as err:
             if err.code == 404:
                 break
@@ -116,7 +120,8 @@ def createZip(ticker, cik, filename, competitors):
     k = 0
     for f in files:
         try:
-            urllib.request.urlretrieve(files[k], dir + "10-Q " + str(k+1) + ".xlsx")
+            temp = os.path.join(dirct, "10-Q" + str(k+1) + ".xlsx")
+            opener.retrieve(files[k], temp)
         except HTTPError as err:
             if err.code == 404:
                 break
@@ -131,11 +136,13 @@ def createZip(ticker, cik, filename, competitors):
     #zipdir(dest, zipf)
     #zipf.close()
 
-    shutil.make_archive(dir, 'zip', dest, filename)
+    shutil.make_archive(dirct, 'zip', dest, filename)
 
     #remove temp directory
-    os.remove(dir)
+    os.remove(dirct)
 
     filename = filename + ".zip"
-    dir = os.path.join(dest, filename)
-    return dir
+    dirct = os.path.join(dest, filename)
+    return dirct
+
+createZip('40545', "test", 0)
