@@ -4,6 +4,9 @@ The website uses django for the backend and react for the frontend and graphing.
 and leverages pyTorch. The financial data is provided through the IEX cloud api and you can create a free account
 <a href="https://www.iexcloud.io/core-data/"> here </a>.
 
+The website code is located in the backend folder and the machine learning model 
+is located in the <a href="https://github.com/BraedenKuether/Capstone/tree/main/backend/osig/portfolio_analysis">portfolio analysis</a> folder under MLUtils.
+
 
 # Django Requirements
 <li> <a href ="https://pypi.org/project/mysqlclient/">mysqlclient</a>
