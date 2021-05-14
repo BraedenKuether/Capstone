@@ -36,26 +36,13 @@
                             <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px;">Export Workbook</div></tr>
                         </thead>
                         <tbody>
+                            {% for field in form2 %}
                             <tr>
-                                <td style="width:30%"><label for="competitors">Competitor #1</label></td>
-                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
+                                <td>{{ field.label }}</td>
+                                <td>{{ field }}</td>
+                                {{ field.errors }}
                             </tr>
-                            <tr>
-                                <td><label for="competitors">Competitor #2</label></td>
-                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
-                            </tr>
-                            <tr>
-                                <td><label for="competitors">Competitor #3</label></td>
-                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
-                            </tr>
-                            <tr>
-                                <td><label for="competitors">Competitor #4</label></td>
-                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
-                            </tr>
-                            <tr>
-                                <td><label for="competitors">Competitor #5</label></td>
-                                <td><input class="form-control" type="text" id="ticker" name="ticker" style="width:100%" maxlength="4" size="4" oninput="let p=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(p, p);" /></td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                     <div class="d-grid mx-auto"><input type="submit" value="Export" class="btn btn-block" style="background-color: #DC4405 !important; margin: 5px"></div>
