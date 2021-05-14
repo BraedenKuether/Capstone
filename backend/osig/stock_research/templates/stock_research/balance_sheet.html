@@ -1,0 +1,24 @@
+{% extends "stock_research/base_stock_research.html" %}
+
+{% block stockContent %}
+
+<table class="table table-bordered table-striped align-middle" style="margin-bottom: 0px !important; background-color: white !important; width: 100%;">
+    <thead>
+        <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px;">Balance Sheet</div></tr>
+    </thead>
+    <tbody>
+        {% for x in data %}
+        <tr>
+            <th colspan="2" class="fs-3">Year: {{ x.fiscalYear }}</th>
+        </tr>
+        {% for var1, var2 in x.items%}
+        <tr>
+            <td>{{ var1 }}</td>
+            <td>{{ var2 }}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock stockContent %}

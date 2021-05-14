@@ -2,3 +2,4 @@ backend/osig/frontend/__pycache__/*
 backend/osig/frontend/node_modules/*
 backend/osig/frontend/node_modules/*
 *.pyc
+backend/osig/downloads

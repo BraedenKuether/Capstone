@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Stock Research{% endblock title %}
+
+{% block nav-stock-research %}<a class="nav-link active" aria-current="page" href="{% url 'stock_research' %}">Stock Research</a>{% endblock nav-stock-research %}
+
+{% block content %}
+
+    <div class="row m-0 p-0">
+        <div class="col-3 p-0 me-3" style="margin-bottom: 0px">
+            <div class="data-filter border border-4 border-dark p-1" style="padding: 0px !important; margin-right: 0px; background-color: #DC4405 !important;">
+                <form action="{% url 'ticker_submit' %}" method="post">
+                    <table class="table table-bordered align-middle" style="margin-bottom: 0px !important; background-color: white !important;">
+                        <thead>
+                            <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px;">Data</div></tr>
+                        </thead>
+                        <tbody>
+                            {% for field in form1 %}
+                            <tr>
+                                <td>{{ field.label }}</td>
+                                <td>{{ field }}</td>
+                                {{ field.errors }}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="d-grid mx-auto"><input type="submit" value="Submit" class="btn btn-block" style="background-color: #DC4405 !important; margin: 5px"></div>
+                </form>
+            </div>
+
+            <div class="export-workbook border border-4 border-dark p-1" style="padding: 0px !important; margin-right: 0px; margin-top: 10px; background-color: #DC4405 !important;">
+                <form action="{% url 'excel_workbook' %}" method="post">
+                    <table class="table table-bordered align-middle" style="margin-bottom: 0px !important; background-color: white !important;">
+                        <thead>
+                            <tr><div style="background-color: #DC4405 !important; font-size: x-large; font-weight: bold; text-align: center; padding: 5px;">Export Workbook</div></tr>
+                        </thead>
+                        <tbody>
+                            {% for field in form2 %}
+                            <tr>
+                                <td>{{ field.label }}</td>
+                                <td>{{ field }}</td>
+                                {{ field.errors }}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="d-grid mx-auto"><input type="submit" value="Export" class="btn btn-block" style="background-color: #DC4405 !important; margin: 5px"></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col border border-4 border-dark p-1" style="padding: 0px !important; margin-right: 0px; margin-bottom: 24px; !important;">
+            {% block stockContent %}{% endblock stockContent %}
+        </div>
+    </div>
+{% endblock content %}
