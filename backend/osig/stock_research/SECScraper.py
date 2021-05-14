@@ -156,5 +156,5 @@ def download(ticker, file_name):
     response = HttpResponse(file_wrapper, content_type=file_mimetype)
     response['X-Sendfile'] = file_name
     response['Content-Length'] = os.stat(file_name).st_size
-    response['Content-Disposition'] = 'attachment; filename=%s/' % (ticker)
+    response['Content-Disposition'] = 'attachment; filename=%s' % (ticker)
     return response
