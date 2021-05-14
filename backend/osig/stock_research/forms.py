@@ -23,27 +23,27 @@ class excel_export(forms.Form):
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
     )
-    competetor1 = forms.RegexField(label=_("Competator 1:"), max_length=5,
+    competitors1 = forms.RegexField(label=_("Competitor 1:"), max_length=5,
         regex=r'^[A-Za-z]+$',
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
     )
-    competetor2 = forms.RegexField(label=_("Competator 2:"), max_length=5,
+    competitors2 = forms.RegexField(label=_("Competitor 2:"), max_length=5,
         regex=r'^[A-Za-z]+$',
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
     )
-    competetor3 = forms.RegexField(label=_("Competator 3:"), max_length=5,
+    competitors3 = forms.RegexField(label=_("Competitor 3:"), max_length=5,
         regex=r'^[A-Za-z]+$',
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
     )
-    competetor4 = forms.RegexField(label=_("Competator 3:"), max_length=5,
+    competitors4 = forms.RegexField(label=_("Competitor 3:"), max_length=5,
         regex=r'^[A-Za-z]+$',
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
     )
-    competetor5 = forms.RegexField(label=_("Competator 3:"), max_length=5,
+    competitors5 = forms.RegexField(label=_("Competitor 3:"), max_length=5,
         regex=r'^[A-Za-z]+$',
         help_text=_("5 characters or fewer is required"),
         error_messages={'required': _("Entry only accepts letters"),}
