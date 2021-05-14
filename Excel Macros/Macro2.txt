@@ -1,0 +1,258 @@
+'https:/www.sec.gov/Archives/edgar/data/1045810/000104581020000010/Financial_Report.xlsx
+Option Explicit
+Dim FILLHGBSROWSTART As Long
+
+
+Sub main2()
+    Application.ScreenUpdating = False
+    Call fillHGIS
+    Call fillHGCF
+    Call fillHGBS
+
+End Sub
+
+Sub fillHGIS()
+    Dim wb1 As Workbook
+    Dim ws1 As Worksheet
+    Dim ws2 As Worksheet
+    Dim valid As Boolean
+    Dim valids As Long
+    Dim rowEnd As Long
+    Dim hgrcol As Long
+    Dim rowStart As Long
+    Dim copyRow As Long
+    Dim i As Long
+    Dim formatStart As Long
+    Dim formatEnd As Long
+    Dim insertRows As Long
+    Dim temp As Range
+    
+    Set wb1 = ThisWorkbook
+    Set ws1 = wb1.Sheets("IS")
+    Set ws2 = wb1.Sheets("Historical Growth Rates")
+    ws1.Activate
+    
+    rowEnd = ws1.Cells(Rows.Count, 2).End(xlUp).row
+    rowStart = 11
+    valids = 0
+    formatStart = 16
+    formatEnd = 20
+    insertRows = 5
+    
+    For i = 7 To rowEnd
+        valid = validHG(i, ws1)
+        If valid = True Then
+            Call insertFormatHG(formatStart, formatEnd, insertRows, ws2)
+            formatStart = formatStart + insertRows
+            formatEnd = formatEnd + insertRows
+            ws1.Activate
+            copyRow = rowStart + (insertRows * valids)
+            Set temp = Range(Cells(i, 2), Cells(i, 7)) 'Destination:=ws2.Cells(copyRow, 2)
+            temp.Copy
+            ws2.Cells(copyRow, 2).PasteSpecial Paste:=xlPasteValues
+            valids = valids + 1
+        End If
+    Next i
+
+End Sub
+
+Sub fillHGCF()
+    Dim wb1 As Workbook
+    Dim ws1 As Worksheet
+    Dim ws2 As Worksheet
+    Dim valid As Boolean
+    Dim valids As Long
+    Dim rowEnd As Long
+    Dim hgrcol As Long
+    Dim rowStart As Long
+    Dim copyRow As Long
+    Dim i As Long
+    Dim formatStart As Long
+    Dim formatEnd As Long
+    Dim insertRows As Long
+    Dim temp As Range
+    
+    Set wb1 = ThisWorkbook
+    Set ws1 = wb1.Sheets("CF")
+    Set ws2 = wb1.Sheets("Historical Growth Rates")
+    
+    rowStart = 11
+    insertRows = 5
+    rowStart = findNextOpenHG(ws2, rowStart, insertRows, "CF")
+    FILLHGBSROWSTART = rowStart
+    
+    ws1.Activate
+    rowEnd = ws1.Cells(Rows.Count, 2).End(xlUp).row
+    valids = 0
+    formatStart = rowStart + insertRows
+    formatEnd = formatStart + 4
+    
+    
+    For i = 7 To rowEnd
+        valid = validHGCF(i, ws1)
+        If valid = True Then
+            Call insertFormatHG(formatStart, formatEnd, insertRows, ws2)
+            formatStart = formatStart + insertRows
+            formatEnd = formatEnd + insertRows
+            ws1.Activate
+            copyRow = rowStart + (insertRows * valids)
+            Set temp = Range(Cells(i, 2), Cells(i, 7)) 'Destination:=ws2.Cells(copyRow, 2)
+            temp.Copy
+            ws2.Cells(copyRow, 2).PasteSpecial Paste:=xlPasteValues
+            valids = valids + 1
+        End If
+    Next i
+
+End Sub
+
+Sub fillHGBS()
+    Dim wb1 As Workbook
+    Dim ws1 As Worksheet
+    Dim ws2 As Worksheet
+    Dim valid As Boolean
+    Dim valids As Long
+    Dim rowEnd As Long
+    Dim hgrcol As Long
+    Dim rowStart As Long
+    Dim copyRow As Long
+    Dim i As Long
+    Dim formatStart As Long
+    Dim formatEnd As Long
+    Dim insertRows As Long
+    Dim temp As Range
+    
+    Set wb1 = ThisWorkbook
+    Set ws1 = wb1.Sheets("BS")
+    Set ws2 = wb1.Sheets("Historical Growth Rates")
+    
+    rowStart = FILLHGBSROWSTART
+    insertRows = 5
+    rowStart = findNextOpenHG(ws2, rowStart, insertRows, "BS")
+    
+    ws1.Activate
+    rowEnd = ws1.Cells(Rows.Count, 2).End(xlUp).row
+    valids = 0
+    formatStart = rowStart + insertRows
+    formatEnd = formatStart + 4
+    
+    
+    For i = 7 To rowEnd
+        valid = validHGBS(i, ws1)
+        If valid = True Then
+            Call insertFormatHG(formatStart, formatEnd, insertRows, ws2)
+            formatStart = formatStart + insertRows
+            formatEnd = formatEnd + insertRows
+            ws1.Activate
+            copyRow = rowStart + (insertRows * valids)
+            Set temp = Range(Cells(i, 2), Cells(i, 7)) 'Destination:=ws2.Cells(copyRow, 2)
+            temp.Copy
+            ws2.Cells(copyRow, 2).PasteSpecial Paste:=xlPasteValues
+            valids = valids + 1
+        End If
+    Next i
+
+End Sub
+
+Function validHG(row As Long, ws1 As Worksheet)
+    Dim i As Long
+    Dim empties As Long
+    
+    empties = 0
+    
+    For i = 3 To 7
+        If ws1.Cells(row, i) = "" Then
+            empties = empties + 1
+        End If
+    Next i
+    
+    If empties > 3 Then
+        validHG = False
+    Else
+        validHG = True
+    End If
+
+End Function
+
+Function validHGCF(row As Long, ws1 As Worksheet)
+    Dim check As Boolean
+    
+    validHGCF = False
+    check = validHG(row, ws1)
+    
+    If check = True Then
+        If ws1.Cells(row, 2) = "Depreciation and amortization" Then
+            validHGCF = True
+        ElseIf ws1.Cells(row, 2) = "Purchases of property and equipment and intangible assets" Then
+            validHGCF = True
+        ElseIf ws1.Cells(row, 2) = "Net cash provided by (used in) investing activities" Then
+            validHGCF = True
+        End If
+    End If
+
+End Function
+
+Function validHGBS(row As Long, ws1 As Worksheet)
+    Dim check As Boolean
+    
+    validHGBS = False
+    check = validHG(row, ws1)
+    
+    If check = True Then
+        If ws1.Cells(row, 2) = "Cash and cash equivalents" Then
+            validHGBS = True
+        ElseIf ws1.Cells(row, 2) = "Total current assets" Then
+            validHGBS = True
+        ElseIf ws1.Cells(row, 2) = "Total assets" Then
+            validHGBS = True
+        ElseIf ws1.Cells(row, 2) = "Total current liabilities" Then
+            validHGBS = True
+        ElseIf ws1.Cells(row, 2) = "Total liabilities" Then
+            validHGBS = True
+        ElseIf ws1.Cells(row, 2) = "Long-term debt" Then
+            validHGBS = True
+        End If
+    End If
+
+End Function
+
+Sub insertFormatHG(formatStart As Long, formatEnd As Long, insertRows As Long, ws1 As Worksheet)
+    Dim temp As Range
+    
+    ws1.Activate
+    ws1.Cells(formatEnd, 1).EntireRow.Resize(insertRows).Insert Shift:=xlDown
+    Set temp = Range(Cells(formatStart, 2), Cells(formatEnd, 10)) 'Destination:=ws2.Cells(copyRow, 2)
+    temp.Copy Destination:=ws1.Cells(formatEnd + 1, 2)
+
+End Sub
+
+Function findNextOpenHG(ws1 As Worksheet, formatStart As Long, insertRows As Long, statement As String)
+    Dim rowEnd As Long
+    Dim i As Long
+    Dim temp As Range
+    
+    ws1.Activate
+    findNextOpenHG = 0
+    i = formatStart
+    rowEnd = ws1.Cells(Rows.Count, 2).End(xlUp).row
+    
+    Do While i <= rowEnd
+        If ws1.Cells(i, 2).Value = "" Then
+            findNextOpenHG = i
+            Exit Do
+        End If
+        i = i + insertRows
+    Loop
+    
+    If findNextOpenHG <> 0 Then
+        Cells(findNextOpenHG, 1).EntireRow.Resize(2).Insert Shift:=xlDown
+        Set temp = Range(Cells(9, 1), Cells(9, 10)) 'Destination:=ws2.Cells(copyRow, 2)
+        temp.Copy Destination:=ws1.Cells(findNextOpenHG, 1)
+        If statement = "CF" Then
+            Cells(findNextOpenHG, 2).Value = "Statement of Cashflows:"
+        Else
+            Cells(findNextOpenHG, 2).Value = "Balance Sheet:"
+        End If
+        findNextOpenHG = findNextOpenHG + 2
+    End If
+
+End Function

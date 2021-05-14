@@ -1,0 +1,280 @@
+Option Explicit
+Dim FOLDERPATH As String
+'Dim SECFILE As String
+Dim THISYEAR As Long
+
+Sub main()
+    Application.ScreenUpdating = False
+    Call findGlobals
+    Call getFinancials
+End Sub
+
+
+Sub findGlobals()
+    FOLDERPATH = ThisWorkbook.Path
+    THISYEAR = year(Date)
+    'SECFILE = FOLDERPATH & "\" & Dir(FOLDERPATH & "\*" & ".xlsx")
+End Sub
+
+Sub getFinancials()
+    Dim numYears As Long
+    Dim i As Long
+    Dim file As String
+    
+    numYears = 5
+    
+    For i = 1 To numYears
+        file = FOLDERPATH & "\" & "10-K " & i & ".xlsx"
+        Call getIncomeStatement(i, file)
+        Call getBalanceSheet(i, file)
+        Call getCashFlows(i, file)
+    Next i
+    
+End Sub
+
+
+Sub getIncomeStatement(year As Long, file As String)
+
+    Dim wb1 As Excel.Workbook
+    Dim wb2 As Excel.Workbook
+    Dim ws1 As Excel.Worksheet
+    Dim ws2 As Excel.Worksheet
+    Dim i As Long
+    Dim j As Long
+    Dim frow As Long
+    Dim trow As Long
+    Dim fcol As Long
+    Dim tcol As Long
+    Dim frowEnd As Long
+    Dim trowEnd As Long
+    Dim frowTemp As Long
+    Dim yr As Long
+    Dim yrCheck As Long
+    Dim validate As Variant
+    
+    frow = 2
+    trow = 7
+    fcol = 2
+    tcol = 8 - year
+    frowTemp = 0
+    
+    Set wb1 = Workbooks.Open(file)
+    Set wb2 = ThisWorkbook
+    Set ws1 = wb1.Sheets("Consolidated Statements of Oper")
+    Set ws2 = wb2.Sheets("IS")
+    yr = findYear(ws1, frow, fcol)
+    
+    If year = 1 Then
+        Call getLineItems(ws1, ws2, trow)
+        yrCheck = yr
+    Else
+        yrCheck = yrCheck - 1
+        If yrCheck <> yr Then
+            'MsgBox ("Potential mismatch with years")
+            'MsgBox (yr)
+            'MsgBox (yrCheck)
+        End If
+    End If
+    
+    ws1.Activate
+    frowEnd = ws1.Cells(Rows.Count, fcol).End(xlUp).row
+    trowEnd = ws2.Cells(Rows.Count, fcol).End(xlUp).row
+    
+    For i = trow To trowEnd
+        frowTemp = i - (trow - (frow + 1))
+        If validateLineItem(ws1, ws2, i, frowTemp, tcol, fcol) = True Then
+            ws2.Cells(i, tcol) = ws1.Cells(frowTemp, fcol)
+            GoTo NextIteration
+        Else
+            For j = frow + 1 To frowEnd
+                If validateLineItem(ws1, ws2, i, j, tcol, fcol) = True Then
+                    ws2.Cells(i, tcol) = ws1.Cells(j, fcol)
+                    GoTo NextIteration
+                End If
+            Next j
+        End If
+NextIteration:
+    Next i
+    
+    'ws1.Range(Cells(frow + 1, fcol), Cells(frowEnd, fcol)).Copy Destination:=ws2.Cells(trow, tcol) 'Destination:=ws2.Range(Cells(tcol, trow), Cells(tcol, trow + frowEnd))
+    wb1.Close
+
+End Sub
+
+Sub getBalanceSheet(year As Long, file As String)
+    Dim wb1 As Excel.Workbook
+    Dim wb2 As Excel.Workbook
+    Dim ws1 As Excel.Worksheet
+    Dim ws2 As Excel.Worksheet
+    Dim i As Long
+    Dim j As Long
+    Dim frow As Long
+    Dim trow As Long
+    Dim fcol As Long
+    Dim tcol As Long
+    Dim frowEnd As Long
+    Dim trowEnd As Long
+    Dim frowTemp As Long
+    Dim yr As Long
+    Dim yrCheck As Long
+    
+    frow = 1
+    trow = 7
+    fcol = 2
+    tcol = 8 - year
+    frowTemp = 0
+
+    Set wb1 = Workbooks.Open(file)
+    Set wb2 = ThisWorkbook
+    Set ws1 = wb1.Sheets("Consolidated Balance Sheets")
+    Set ws2 = wb2.Sheets("BS")
+    yr = findYear(ws1, frow, fcol)
+    
+    If year = 1 Then
+        Call getLineItems(ws1, ws2, trow)
+        yrCheck = yr
+    Else
+        yrCheck = yrCheck - 1
+        If yrCheck <> yr Then
+            'MsgBox ("Potential mismatch with years")
+            'MsgBox (yr)
+            'MsgBox (yrCheck)
+        End If
+    End If
+    
+    ws1.Activate
+    frowEnd = ws1.Cells(Rows.Count, fcol).End(xlUp).row
+    trowEnd = ws2.Cells(Rows.Count, fcol).End(xlUp).row
+    
+    For i = trow To trowEnd
+        frowTemp = i - (trow - (frow + 1))
+        If validateLineItem(ws1, ws2, i, frowTemp, tcol, fcol) = True Then
+            ws2.Cells(i, tcol) = ws1.Cells(frowTemp, fcol)
+            GoTo NextIteration
+        Else
+            For j = frow + 1 To frowEnd
+                If validateLineItem(ws1, ws2, i, j, tcol, fcol) = True Then
+                    ws2.Cells(i, tcol) = ws1.Cells(j, fcol)
+                    GoTo NextIteration
+                End If
+            Next j
+        End If
+NextIteration:
+    Next i
+    
+    'ws1.Range(Cells(frow + 1, fcol), Cells(frowEnd, fcol)).Copy Destination:=ws2.Cells(trow, tcol) 'Destination:=ws2.Range(Cells(tcol, trow), Cells(tcol, trow + frowEnd))
+    wb1.Close
+
+End Sub
+
+Sub getCashFlows(year As Long, file As String)
+    Dim wb1 As Excel.Workbook
+    Dim wb2 As Excel.Workbook
+    Dim ws1 As Excel.Worksheet
+    Dim ws2 As Excel.Worksheet
+    Dim i As Long
+    Dim j As Long
+    Dim frow As Long
+    Dim trow As Long
+    Dim fcol As Long
+    Dim tcol As Long
+    Dim frowEnd As Long
+    Dim trowEnd As Long
+    Dim frowTemp As Long
+    Dim yr As Long
+    Dim yrCheck As Long
+    
+    frow = 2
+    trow = 7
+    fcol = 2
+    tcol = 8 - year
+    frowTemp = 0
+    
+    Set wb1 = Workbooks.Open(file)
+    Set wb2 = ThisWorkbook
+    Set ws1 = wb1.Sheets("Consolidated Statements of Cash")
+    Set ws2 = wb2.Sheets("CF")
+    yr = findYear(ws1, frow, fcol)
+    
+    If year = 1 Then
+        Call getLineItems(ws1, ws2, trow)
+        yrCheck = yr
+    Else
+        yrCheck = yrCheck - 1
+        If yrCheck <> yr Then
+            'MsgBox ("Potential mismatch with years")
+            'MsgBox (yr)
+            'MsgBox (yrCheck)
+        End If
+    End If
+    
+    ws1.Activate
+    frowEnd = ws1.Cells(Rows.Count, fcol).End(xlUp).row
+    trowEnd = ws2.Cells(Rows.Count, fcol).End(xlUp).row
+
+    For i = trow To trowEnd
+        frowTemp = i - (trow - (frow + 1))
+        If validateLineItem(ws1, ws2, i, frowTemp, tcol, fcol) = True Then
+            ws2.Cells(i, tcol) = ws1.Cells(frowTemp, fcol)
+            GoTo NextIteration
+        Else
+            For j = frow + 1 To frowEnd
+                If validateLineItem(ws1, ws2, i, j, tcol, fcol) = True Then
+                    ws2.Cells(i, tcol) = ws1.Cells(j, fcol)
+                    GoTo NextIteration
+                End If
+            Next j
+        End If
+NextIteration:
+    Next i
+    
+    'ws1.Range(Cells(frow + 1, fcol), Cells(frowEnd, fcol)).Copy Destination:=ws2.Cells(trow, tcol) 'Destination:=ws2.Range(Cells(tcol, trow), Cells(tcol, trow + frowEnd))
+    wb1.Close
+    
+End Sub
+
+Function findYear(ws1 As Worksheet, row As Long, col As Long)
+    Dim temp As String
+    temp = Right(ws1.Cells(row, col), 4)
+    findYear = CLng(temp)
+End Function
+
+Sub getLineItems(ws1 As Worksheet, ws2 As Worksheet, trow As Long)
+    Dim frowEnd As Long
+    ws1.Activate
+    frowEnd = Cells(Rows.Count, 1).End(xlUp).row
+    Range(Cells(3, 1), Cells(frowEnd, 1)).Copy Destination:=ws2.Cells(trow, 2) 'First column of SEC file to second column of template
+End Sub
+
+Function validateLineItem(ws1 As Worksheet, ws2 As Worksheet, trow As Long, frow As Long, tcol As Long, fcol As Long)
+    Dim frowEnd As Long
+    Dim i As Long
+    
+    validateLineItem = False
+    
+    If ws2.Cells(trow, 2) = ws1.Cells(frow, 1) Then
+        validateLineItem = True
+    End If
+    
+    If checkDuplicate(ws1, ws2, trow, frow, tcol, fcol) = True Then
+        validateLineItem = False
+    End If
+    
+End Function
+
+Function checkDuplicate(ws1 As Worksheet, ws2 As Worksheet, trow As Long, frow As Long, tcol As Long, fcol As Long)
+    Dim i As Long
+    
+    checkDuplicate = False
+    
+    For i = 7 To trow - 1
+        If ws2.Cells(i, tcol) = ws1.Cells(frow, fcol) And ws2.Cells(i, 2) = ws1.Cells(frow, 1) Then
+            'MsgBox ("i, trow: " & i & trow)
+            checkDuplicate = True
+        End If
+    Next i
+End Function
+
+
+
+
