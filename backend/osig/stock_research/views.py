@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import logging
 from .forms import stock_form, excel_export
-from .SECScraper import createZip download
+from .SECScraper import createZip, download
 
 import pyEX as pyx
 import json
