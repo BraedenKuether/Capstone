@@ -5,6 +5,9 @@ from pathlib import Path
 import zipfile
 import shutil
 import os
+from django.conf import settings
+from django.http import HttpResponse, HttpResponseRedirect, response, Http404, StreamingHttpResponse, FileResponse
+from wsgiref.util import FileWrapper
 
 #def zipdir(path, ziph):
 #    for root, dirs, files in os.walk(path):
@@ -144,3 +147,13 @@ def createZip(cik, filename, competitors):
     filename = filename + ".zip"
     dirct = os.path.join(dest, filename)
     return dirct
+
+def download(request,file_name):
+    file_path = settings.MEDIA_ROOT +'/'+ file_name
+    file_wrapper = FileWrapper(file(file_path,'rb'))
+    file_mimetype = mimetypes.guess_type(file_path)
+    response = HttpResponse(file_wrapper, content_type=file_mimetype )
+    response['X-Sendfile'] = file_path
+    response['Content-Length'] = os.stat(file_path).st_size
+    response['Content-Disposition'] = 'attachment; filename=%s/' % smart_str(file_name)
+    return response
