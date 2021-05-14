@@ -8,6 +8,7 @@ import os
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, response, Http404, StreamingHttpResponse, FileResponse
 from wsgiref.util import FileWrapper
+import mimetypes
 
 #def zipdir(path, ziph):
 #    for root, dirs, files in os.walk(path):
@@ -22,7 +23,7 @@ def createZip(cik, filename, competitors):
     #ticker = ""
     dest = os.path.join(Path.cwd(), "downloads")
     dirct = os.path.join(dest, filename)
-    os.mkdir(dirct)
+    os.makedirs(dirct)
 
     #CIK from JSON response
     #cik = "858877"
@@ -142,18 +143,18 @@ def createZip(cik, filename, competitors):
     shutil.make_archive(dirct, 'zip', dest, filename)
 
     #remove temp directory
-    os.remove(dirct)
+    shutil.rmtree(dirct)
 
     filename = filename + ".zip"
     dirct = os.path.join(dest, filename)
     return dirct
 
-def download(request,file_name):
-    file_path = settings.MEDIA_ROOT +'/'+ file_name
-    file_wrapper = FileWrapper(file(file_path,'rb'))
-    file_mimetype = mimetypes.guess_type(file_path)
-    response = HttpResponse(file_wrapper, content_type=file_mimetype )
-    response['X-Sendfile'] = file_path
-    response['Content-Length'] = os.stat(file_path).st_size
-    response['Content-Disposition'] = 'attachment; filename=%s/' % smart_str(file_name)
+def download(ticker, file_name):
+    #file_path = settings.MEDIA_ROOT +'/'+ file_name
+    file_wrapper = FileWrapper(open(file_name,'rb'))
+    file_mimetype = mimetypes.guess_type(file_name)
+    response = HttpResponse(file_wrapper, content_type=file_mimetype)
+    response['X-Sendfile'] = file_name
+    response['Content-Length'] = os.stat(file_name).st_size
+    response['Content-Disposition'] = 'attachment; filename=%s/' % (ticker)
     return response

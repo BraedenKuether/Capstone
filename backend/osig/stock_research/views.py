@@ -81,7 +81,8 @@ def excel_workbook(request):
             competitors.append(comp3)
             competitors.append(comp4)
             competitors.append(comp5)
-            response = download(createZip(cik, ticker, competitors))
+            response = download((ticker+".zip"), (createZip('858877', ticker, competitors)))
+            return response
 
     else:
         form1 = stock_form()
