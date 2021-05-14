@@ -68,12 +68,21 @@ def excel_workbook(request):
         form2 = excel_export(request.POST)
         if form2.is_valid():
             ticker = form2.cleaned_data['ticker']
-            data = client.advancedStats(ticker)
-            comp1 = form2.cleaned_data['competetor1']
-            comp2 = form2.cleaned_data['competetor2']
-            comp3 = form2.cleaned_data['competetor3']
-            comp4 = form2.cleaned_data['competetor4']
-            comp5 = form2.cleaned_data['competetor5']
+            cik = client.advancedStats(ticker)
+            cik = cik.get('cik')
+            comp1 = form2.cleaned_data['competitors1']
+            comp2 = form2.cleaned_data['competitors2']
+            comp3 = form2.cleaned_data['competitors3']
+            comp4 = form2.cleaned_data['competitors4']
+            comp5 = form2.cleaned_data['competitors5']
+            competitors = []
+            competitors.append(comp1)
+            competitors.append(comp2)
+            competitors.append(comp3)
+            competitors.append(comp4)
+            competitors.append(comp5)
+            response = download(createZip(cik, ticker, competitors))
+
     else:
         form1 = stock_form()
         form2 = excel_export()
