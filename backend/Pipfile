@@ -6,6 +6,13 @@ name = "pypi"
 [packages]
 django = "*"
 pyex = "*"
+djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
+torch = "*"
+matplotlib = "*"
+scikit-learn = "*"
+mysqlclient = "*"
 
 [dev-packages]
 
