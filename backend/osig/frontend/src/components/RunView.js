@@ -3,6 +3,9 @@ import { render } from "react-dom";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { ResponsiveLine } from '@nivo/line';
 import { ResponsiveBar } from '@nivo/bar'
+import {PriceEarnings,ModelReturns,
+        CumulativeReturns,DividendYield,
+        PriceShares, TopBottom} from "./Graphs.js"
 
 class RunView extends Component {
   constructor(props) {
@@ -13,8 +16,10 @@ class RunView extends Component {
       loaded: false,
       placeholder: "Loading",
       data: null,
-      weights_str: ""
+      weights_str: "",
+      currentGraph:"CR"
     };
+    this.getGraphChange = this.getGraph.bind(this);
   }
   
   componentDidMount() {
@@ -41,509 +46,98 @@ class RunView extends Component {
         console.log(this.state.data.alphabeta[0]);
     })
   }
+  
+  getGraph(event){
+    this.setState({currentGraph : event.target.value});
+  } 
 
   render() {
     if (this.state.data === null) {
       return null;
     }
-    return (
+    let graph;
+    switch (this.state.currentGraph) {
       
-      <div className='ViewContainer'>
-      <h2>Recommended Weighting</h2>
+      case "CR":
+        graph = <CumulativeReturns state={this.state}/>;
+        break;
+
+      case "MR":
+        graph = <ModelReturns state={this.state}/>;
+        break; 
+
+      case "TB":
+        graph = <TopBottom state={this.state}/>;
+        break;
+
+      case "PE":
+        graph = <PriceEarnings state={this.state}/>;
+        break;
+
+      case "PS":
+        graph = <PriceShares state={this.state}/>;
+        break;
+
+      case "DY":
+        graph = <DividendYield state={this.state}/>;
+        console.log("fell thru");
+        break;
+    }
+    return (
       <div>
-      {this.state.weights_str}
-      </div>
-      <h2>Simulated Returns With ML Model</h2>
-        <div style={{height:'600px',width:'1200px'}}>
-         <ResponsiveLine
-          data={this.state.graph_returns}
-           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-            xScale={{ type: 'point' }}
-             yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
-              yFormat=" >-.2f"
-               axisTop={null}
-                axisRight={null}
-                 axisBottom={{
-                  orient: 'bottom',
-                   tickSize: 5,
-                    tickPadding: 5,
-                     tickRotation: 0,
-                      legend: 'Date',
-                       legendOffset: 36,
-                        legendPosition: 'middle'
-                         }}
-                          axisLeft={{
-                           orient: 'left',
-                            tickSize: 5,
-                             tickPadding: 5,
-                              tickRotation: 0,
-                               legend: 'count',
-                                legendOffset: -40,
-                                 legendPosition: 'middle'
-                                  }}
-                                   pointSize={10}
-                                    pointColor={{ theme: 'background' }}
-                                     pointBorderWidth={2}
-                                      pointBorderColor={{ from: 'serieColor' }}
-                                       pointLabelYOffset={-12}
-                                        useMesh={true}
-                                         legends={[
-                                          {
-                                           anchor: 'bottom-right',
-                                            direction: 'column',
-                                             justify: false,
-                                              translateX: 100,
-                                               translateY: 0,
-                                                itemsSpacing: 0,
-                                                 itemDirection: 'left-to-right',
-                                                  itemWidth: 80,
-                                                   itemHeight: 20,
-                                                    itemOpacity: 0.75,
-                                                     symbolSize: 12,
-                                                      symbolShape: 'circle',
-                                                       symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                                                        effects: [
-                                                         {
-                                                          on: 'hover',
-                                                           style: {
-                                                            itemBackground: 'rgba(0, 0, 0, .03)',
-                                                             itemOpacity: 1
-                                                              }
-                                                               }
-                                                                ]
-                                                                 }
-                                                                  ]}
-                                                                   />
-        </div>
-        <h2>Cumalitive Returns With Inputted Weights</h2>
-         <div style={{height:'600px',width:'1200px'}}>
-         <ResponsiveLine
-          data={this.state.graph_cumreturns}
-           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-            xScale={{ type: 'point' }}
-             yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
-              yFormat=" >-.2f"
-               axisTop={null}
-                axisRight={null}
-                 axisBottom={{
-                  orient: 'bottom',
-                   tickSize: 5,
-                    tickPadding: 5,
-                     tickRotation: 0,
-                      legend: 'Date',
-                       legendOffset: 36,
-                        legendPosition: 'middle'
-                         }}
-                          axisLeft={{
-                           orient: 'left',
-                            tickSize: 5,
-                             tickPadding: 5,
-                              tickRotation: 0,
-                               legend: 'count',
-                                legendOffset: -40,
-                                 legendPosition: 'middle'
-                                  }}
-                                   pointSize={10}
-                                    pointColor={{ theme: 'background' }}
-                                     pointBorderWidth={2}
-                                      pointBorderColor={{ from: 'serieColor' }}
-                                       pointLabelYOffset={-12}
-                                        useMesh={true}
-                                         legends={[
-                                          {
-                                           anchor: 'bottom-right',
-                                            direction: 'column',
-                                             justify: false,
-                                              translateX: 100,
-                                               translateY: 0,
-                                                itemsSpacing: 0,
-                                                 itemDirection: 'left-to-right',
-                                                  itemWidth: 80,
-                                                   itemHeight: 20,
-                                                    itemOpacity: 0.75,
-                                                     symbolSize: 12,
-                                                      symbolShape: 'circle',
-                                                       symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                                                        effects: [
-                                                         {
-                                                          on: 'hover',
-                                                           style: {
-                                                            itemBackground: 'rgba(0, 0, 0, .03)',
-                                                             itemOpacity: 1
-                                                              }
-                                                               }
-                                                                ]
-                                                                 }
-                                                                  ]}
-                                                                   />
-        </div>
-        <h2>Dividend Yield</h2>
-        <div style={{height:'600px',width:'1200px'}}>
-        <ResponsiveBar
-            data={this.state.data.dividendyield}
-            margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-            keys={['returns']}
-            indexBy="ticker"
-            height = {500}
-            padding={0.3}
-            valueScale={{ type: 'linear' }}
-            indexScale={{ type: 'band', round: true }}
-            colors={{ scheme: 'nivo' }}
-            defs={[
-                {
-                    id: 'dots',
-                    type: 'patternDots',
-                    background: 'inherit',
-                    color: '#38bcb2',
-                    size: 4,
-                    padding: 1,
-                    stagger: true
-                },
-                {
-                    id: 'lines',
-                    type: 'patternLines',
-                    background: 'inherit',
-                    color: '#eed312',
-                    rotation: -45,
-                    lineWidth: 6,
-                    spacing: 10
-                }
-            ]}
-            borderColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-            axisTop={null}
-            axisRight={null}
-            axisBottom={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'ticker',
-                legendPosition: 'middle',
-                legendOffset: 32
-            }}
-            axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'return',
-                legendPosition: 'middle',
-                legendOffset: -40
-            }}
-            labelSkipWidth={12}
-            labelSkipHeight={12}
-            labelTextColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-            legends={[
-                {
-                    dataFrom: 'keys',
-                    anchor: 'bottom-right',
-                    direction: 'column',
-                    justify: false,
-                    translateX: 120,
-                    translateY: 0,
-                    itemsSpacing: 2,
-                    itemWidth: 100,
-                    itemHeight: 20,
-                    itemDirection: 'left-to-right',
-                    itemOpacity: 0.85,
-                    symbolSize: 20,
-                    effects: [
-                        {
-                            on: 'hover',
-                            style: {
-                                itemOpacity: 1
-                            }
-                        }
-                    ]
-                }
-            ]}
-            animate={true}
-            motionStiffness={90}
-            motionDamping={15}
-        />
-        </div>
-        <h2>Price Per Earnings</h2>
-        <div style={{height:'600px',width:'1200px'}}>
-        <ResponsiveBar
-            data={this.state.data.priceearnings[0]}
-            margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-            keys={['returns']}
-            indexBy="ticker"
-            height = {500}
-            padding={0.3}
-            valueScale={{ type: 'linear' }}
-            indexScale={{ type: 'band', round: true }}
-            colors={{ scheme: 'nivo' }}
-            defs={[
-                {
-                    id: 'dots',
-                    type: 'patternDots',
-                    background: 'inherit',
-                    color: '#38bcb2',
-                    size: 4,
-                    padding: 1,
-                    stagger: true
-                },
-                {
-                    id: 'lines',
-                    type: 'patternLines',
-                    background: 'inherit',
-                    color: '#eed312',
-                    rotation: -45,
-                    lineWidth: 6,
-                    spacing: 10
-                }
-            ]}
-            borderColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-            axisTop={null}
-            axisRight={null}
-            axisBottom={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'ticker',
-                legendPosition: 'middle',
-                legendOffset: 32
-            }}
-            axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'return',
-                legendPosition: 'middle',
-                legendOffset: -40
-            }}
-            labelSkipWidth={12}
-            labelSkipHeight={12}
-            labelTextColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-            legends={[
-                {
-                    dataFrom: 'keys',
-                    anchor: 'bottom-right',
-                    direction: 'column',
-                    justify: false,
-                    translateX: 120,
-                    translateY: 0,
-                    itemsSpacing: 2,
-                    itemWidth: 100,
-                    itemHeight: 20,
-                    itemDirection: 'left-to-right',
-                    itemOpacity: 0.85,
-                    symbolSize: 20,
-                    effects: [
-                        {
-                            on: 'hover',
-                            style: {
-                                itemOpacity: 1
-                            }
-                        }
-                    ]
-                }
-            ]}
-            animate={true}
-            motionStiffness={90}
-            motionDamping={15}
-        />
-        </div>
-        <h2>Price to Sales Ratios</h2>
-        <div style={{height:'600px',width:'1200px'}}>
-        <ResponsiveBar
-            data={this.state.data.priceshares[0]}
-            margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-            keys={['returns']}
-            indexBy="ticker"
-            height = {500}
-            padding={0.3}
-            valueScale={{ type: 'linear' }}
-            indexScale={{ type: 'band', round: true }}
-            colors={{ scheme: 'nivo' }}
-            defs={[
-                {
-                    id: 'dots',
-                    type: 'patternDots',
-                    background: 'inherit',
-                    color: '#38bcb2',
-                    size: 4,
-                    padding: 1,
-                    stagger: true
-                },
-                {
-                    id: 'lines',
-                    type: 'patternLines',
-                    background: 'inherit',
-                    color: '#eed312',
-                    rotation: -45,
-                    lineWidth: 6,
-                    spacing: 10
-                }
-            ]}
-            borderColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-            axisTop={null}
-            axisRight={null}
-            axisBottom={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'ticker',
-                legendPosition: 'middle',
-                legendOffset: 32
-            }}
-            axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'return',
-                legendPosition: 'middle',
-                legendOffset: -40
-            }}
-            labelSkipWidth={12}
-            labelSkipHeight={12}
-            labelTextColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-            legends={[
-                {
-                    dataFrom: 'keys',
-                    anchor: 'bottom-right',
-                    direction: 'column',
-                    justify: false,
-                    translateX: 120,
-                    translateY: 0,
-                    itemsSpacing: 2,
-                    itemWidth: 100,
-                    itemHeight: 20,
-                    itemDirection: 'left-to-right',
-                    itemOpacity: 0.85,
-                    symbolSize: 20,
-                    effects: [
-                        {
-                            on: 'hover',
-                            style: {
-                                itemOpacity: 1
-                            }
-                        }
-                    ]
-                }
-            ]}
-            animate={true}
-            motionStiffness={90}
-            motionDamping={15}
-        />
-        </div>
-        <h2>Performance Per Share</h2>
-        <div style={{height:'600px',width:'1200px'}}>
-        <ResponsiveBar
-            data={this.state.data.topbottomperf}
-            margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-            keys={['returns']}
-            indexBy="ticker"
-            height = {500}
-            padding={0.3}
-            valueScale={{ type: 'linear' }}
-            indexScale={{ type: 'band', round: true }}
-            colors={{ scheme: 'nivo' }}
-            defs={[
-                {
-                    id: 'dots',
-                    type: 'patternDots',
-                    background: 'inherit',
-                    color: '#38bcb2',
-                    size: 4,
-                    padding: 1,
-                    stagger: true
-                },
-                {
-                    id: 'lines',
-                    type: 'patternLines',
-                    background: 'inherit',
-                    color: '#eed312',
-                    rotation: -45,
-                    lineWidth: 6,
-                    spacing: 10
-                }
-            ]}
-            borderColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-            axisTop={null}
-            axisRight={null}
-            axisBottom={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'ticker',
-                legendPosition: 'middle',
-                legendOffset: 32
-            }}
-            axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'return',
-                legendPosition: 'middle',
-                legendOffset: -40
-            }}
-            labelSkipWidth={12}
-            labelSkipHeight={12}
-            labelTextColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-            legends={[
-                {
-                    dataFrom: 'keys',
-                    anchor: 'bottom-right',
-                    direction: 'column',
-                    justify: false,
-                    translateX: 120,
-                    translateY: 0,
-                    itemsSpacing: 2,
-                    itemWidth: 100,
-                    itemHeight: 20,
-                    itemDirection: 'left-to-right',
-                    itemOpacity: 0.85,
-                    symbolSize: 20,
-                    effects: [
-                        {
-                            on: 'hover',
-                            style: {
-                                itemOpacity: 1
-                            }
-                        }
-                    ]
-                }
-            ]}
-            animate={true}
-            motionStiffness={90}
-            motionDamping={15}
-        />
-        </div>
+        <br/>
+        <br/>
+        <select className="form-select" onChange={this.getGraphChange}>
+          <option value="CR">Cumulative Returns</option>
+          <option value="MR">Model Returns</option>
+          <option value="TB">Top Bottom Performers</option>
+          <option value="PE">Price Earnings</option>
+          <option value="PS">Price Shares</option>
+          <option value="DY">Dividend Yield</option>
+        </select>
         <div>
-        <h2>Sharpe Ratio</h2>
-        <div>
-        {this.state.data.sharperatio}
+          {graph}
         </div>
-        </div>
-        <div>
-        <h2>SPYTD</h2>
-        <div>
-        {this.state.data.spytd}
-        </div>
-        </div>
-        <div>
-        <h2>Total Performance</h2>
-        <div>
-        {this.state.data.totalperf}
-        </div>
-        </div>
-        <h2>Risk (Variance/STD)</h2>
-        <div>
-        {this.state.data.portrisk[0]}/{this.state.data.portrisk[1]}
-        </div>
-        <div>
-        <h2>YTD Performance</h2>
-        <div>
-        {this.state.data.ytdperf}
-        </div>
-        <h2>Alpha/Beta</h2>
-        <div>
-        {this.state.data.alphabeta[0]}/{this.state.data.alphabeta[1]}
-        </div>
+        <div class="row">
+            <h2 class="text-center">Portfolio & Weights</h2>
+            <div>
+              {this.state.weights_str}
+            </div>
         </div>
         
-      </div>
-    );
+        <br/>
+        <br/>
+
+        <table className="table table-sm">
+          <thead>
+            <th scope="col">Sharpe Ratio</th>
+            <th scope="col">Risk & Variance</th>
+            <th scope="col">Alpha & Beta</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td> {this.state.data.sharperatio} </td>
+              <td> {this.state.data.portrisk[0]} {this.state.data.portrisk[1]} </td>
+              <td> {this.state.data.alphabeta[0]} {this.state.data.alphabeta[1]} </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <table className="table table-sm">
+          <thead>
+            <th scope="col">Total Performance</th>
+            <th scope="col">YTD Performance</th>
+            <th scope="col">S&P Performance</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td> {this.state.data.totalperf}</td>
+              <td> {this.state.data.ytdperf} </td>
+              <td> {this.state.data.spytd} </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>);
   }
 }
 

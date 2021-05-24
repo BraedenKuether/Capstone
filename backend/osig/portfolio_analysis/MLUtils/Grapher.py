@@ -67,6 +67,8 @@ def toBar(dataDict):
 
 
 def weightsToJson(weights):
+  for i in range(len(weights)):
+    weights[i] = round(weights[i],4)
   data = {"weights":weights}
   return data
 

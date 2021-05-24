@@ -12,6 +12,7 @@ class Portfolio:
     self.assetsByTime = []
     self.numAssets = len(assets)
     self.client = client
+    self.earnings = earnings
     #self.pctChange = None 
     if earnings:
       self.earnings_dfs = []
@@ -23,13 +24,15 @@ class Portfolio:
       for i,asset in enumerate(assets):
         try:
           df = client.balanceSheetDF(asset, period='quarter', last = 12).sort_index()[earnings_feats]
-        except p.common.PyEXception as e:
-          if "Response 404 - " in str(e):
-            raise SymbolError
-          elif "Response 402 - " in str(e):
-            raise CreditError
-          else:
-            raise UknownError
+        except KeyError:#p.common.PyEXception as e:
+          self.earnings = False
+          break
+          #if "Response 404 - " in str(e):
+          #  raise SymbolError
+          #elif "Response 402 - " in str(e):
+          #  raise CreditError
+          #else:
+          #  raise UknownError
 
         normalized_df = (df-df.mean())/df.std()
         normalized_df = normalized_df.fillna(0).replace(np.nan,0)
@@ -51,7 +54,7 @@ class Portfolio:
           else:
             raise UknownError
 
-      if earnings:
+      if self.earnings:
         data = data.loc[min_date:]
       data["returns"] = data["close"].values-data["open"].values
       

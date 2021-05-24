@@ -29,10 +29,11 @@ class Tester:
     self.numFeats = self.portfolio.featurized.shape[1]
     self.weights = []
     #print("train_func:", train_func)
-    if self.train_func == train_net_earnings:
+    if self.train_func == train_net_earnings and P.earnings:
       self.dataset = DailyDataset(P.featurized,P.assetsByTime,self.batch,P.numAssets,self.numFeats,timePeriod,forecast=True,earnings=P.earnings_dfs,num_earning_feats=P.num_earnings_features,dates = P.dates)
       self.net = NetWithEarnings(self.numFeats,P.num_earnings_features,P.numAssets,timePeriod) 
     else:
+      self.train_func = train_net 
       self.dataset = DailyDataset(P.featurized,P.assetsByTime,self.batch,P.numAssets,self.numFeats,timePeriod,forecast=True,dates = P.dates)
       self.net = Net(self.numFeats,P.numAssets,timePeriod)
     
@@ -51,6 +52,9 @@ class Tester:
         weights : array of weights between 0-1 that sum to 1
         s : slice object that determines the time period
         withPlot : turns plotting on and off
+
+
+
 
       returns:
         json object representation of the line graph
@@ -112,7 +116,7 @@ class Tester:
     withSyms = list(zip(changes,symbs))
     dataDict = {}
     for x,name in withSyms:
-      dataDict[name] = x
+      dataDict[name] = round(x,2)
 
     return toBar(dataDict)  
 
@@ -131,7 +135,8 @@ class Tester:
     changes = map(lambda stock: (stock.iloc[-1]-stock.iloc[0])/stock.iloc[0], ytds)
     changes = np.array(list(changes))
     changes = (changes.dot(weights)) + 1 
-    return changes 
+
+    return round(changes,2) 
    
   def ytdPerformance(self,weights):
     '''
@@ -150,7 +155,8 @@ class Tester:
     changes = map(lambda stock: (stock.iloc[-1]-stock.iloc[start])/stock.iloc[start], ytds)
     changes = np.array(list(changes))
     changes = (changes.dot(weights)) + 1 
-    return changes 
+
+    return round(changes,2) 
         
   def spYTD(self):
     '''
@@ -160,7 +166,7 @@ class Tester:
         float representing performance of spy
     '''
     spy = client.chartDF(symbol="spy",timeframe="ytd").sort_index()['close']
-    return ((spy.iloc[-1]-spy.iloc[0])/spy.iloc[0]) + 1 
+    return round(((spy.iloc[-1]-spy.iloc[0])/spy.iloc[0]) + 1,2) 
 
 
   def risk(self,weights):
@@ -185,7 +191,7 @@ class Tester:
         
     std = np.sqrt(var)
 
-    return (var,std)
+    return (round(var,2),round(std,2))
       
   def sharpe(self,weights,riskFree=0.0):  
     '''
@@ -208,7 +214,7 @@ class Tester:
     std = returns['daily return'].std()
     sharpe = mu/std
 
-    return (252**.5)*sharpe
+    return round((252**.5)*sharpe,2)
 
   def alphabeta(self,weights,market="SPY",withPlot=False):
     '''
@@ -265,7 +271,7 @@ class Tester:
       dataDict = {}
       withSymbs = zip(pes,syms)
       for x,name in withSymbs:
-        dataDict[name] = float(x)
+        dataDict[name] = round(float(x),2)
       return toBar(dataDict),np.mean(pes) 
 
 
@@ -292,7 +298,7 @@ class Tester:
       dataDict = {}
       withSymbs = zip(divs,syms)
       for x,name in withSymbs:
-        dataDict[name] = float(x)
+        dataDict[name] = round(float(x),2)
       return toBar(dataDict) 
 
   def psRatio(self,withPlot=True):
@@ -318,7 +324,7 @@ class Tester:
       dataDict = {}
       withSymbs = zip(ps,syms)
       for x,name in withSymbs:
-        dataDict[name] = float(x)
+        dataDict[name] = round(float(x),2)
       return toBar(dataDict),np.mean(ps) 
 
 
