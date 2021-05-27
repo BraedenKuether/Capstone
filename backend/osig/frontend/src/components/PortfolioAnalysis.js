@@ -155,34 +155,44 @@ class PortfolioAnalysis extends Component {
              render={arrayHelpers => (
                 <div>
                   {props.values.tickers && props.values.tickers.length > 0 ? (
+                    <table>
+                    <tr>
+                      <th>Ticker Name</th>
+                      <th>Weighting in Portfolio</th> 
+                      <th>Remove Ticker</th>
+                      <th>Add ticker</th>
+                    </tr>
                     props.values.tickers.map((ticker, index) => (
-                      <div key={index}>
-                        <div>
-                        <label>Ticker Name</label>
+                      <tr key={index}>
+                        <td>
                         <Field 
                         type = "text"
                         name={`tickers.${index}.name`} />
-                        </div>
-                        <div>
-                        <label>Weighting in Portfolio</label>
+                        </td>
+                        <td>
                         <Field 
                         type = "float"
                         name={`tickers.${index}.weight`} />
-                        </div>
+                        </td>
+                        <td>
                         <button
                          type="button"
                          onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
                         >
                         -
                         </button>
+                        </td>
+                        <td>
                         <button
                          type="button"
                          onClick={() => arrayHelpers.insert(index, '')} // insert an empty string at a position
                         >
                         +
                         </button>
-                     </div>
+                        </td>
+                     </tr>
                    ))
+                   </table>
                  ) : (
                    <button type="button" onClick={() => arrayHelpers.push('')}>
                      {/* show this when user has removed all friends from the list */}
