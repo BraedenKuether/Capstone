@@ -23,13 +23,23 @@ class PortfolioAnalysis extends Component {
     };
     var req = new Request(window.location.origin.concat("/api/portfolio_analysis/get_runs/all"), reqInit);
     fetch(req)
-      .then(response => response.json())
-      .then(data => {
-        this.setState({
-          runs: data.data,
-          loaded: true
-        });
-    })
+      .then(response => {
+        if(response.status != 200) {
+          this.setState({
+            errorMsg: "Database Error: Could Not Fetch Runs",
+            loaded: false
+          });
+        }
+        else {
+          response.json()
+          .then(data => {
+            this.setState({
+              runs: data.data,
+              loaded: true
+            })
+          });
+        }
+      });
   }
   
   renderTableHeader() {
@@ -104,7 +114,7 @@ class PortfolioAnalysis extends Component {
         if(response.status != 200) {
           response.text().then(data => {
             this.setState({
-              errorMsg: data,
+              errorMsg: "One or more of the tickers could not be found",
               successMsg: '',
               submitting: ''
             });
@@ -134,11 +144,9 @@ class PortfolioAnalysis extends Component {
           numTickers:0,
          }}
          validate={values => {
-           const errors = {};
-           
-           
-           if (!values.title) {
-             errors.title = 'Required';
+           const errors = {}; 
+           if (values.ticker == []) {
+             errors.tickers = 'Must Have at Least One Ticker';
            }
            console.log(errors)
            return errors;
@@ -159,16 +167,19 @@ class PortfolioAnalysis extends Component {
                       <div key={index}>
                         <div>
                         <label>Ticker Name</label>
+                        <span style={{display:"inline-block", width: "87px"}}></span>
                         <Field 
                         type = "text"
                         name={`tickers.${index}.name`} />
                         </div>
+                        <br/>
                         <div>
-                        <label>Weighting in Portfolio</label>
+                        <label>Weighting in Portfolio &emsp;</label>
                         <Field 
                         type = "float"
                         name={`tickers.${index}.weight`} />
                         </div>
+                        <br/>
                         <button
                          type="button"
                          onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
@@ -181,6 +192,7 @@ class PortfolioAnalysis extends Component {
                         >
                         +
                         </button>
+                        <br/>
                      </div>
                    ))
                  ) : (
@@ -192,7 +204,8 @@ class PortfolioAnalysis extends Component {
                 </div>
              )}
              />
-              <label>Title</label>
+              <br/>
+              <label>Title &emsp;</label>
               <Field
                type="text"
                name="title"
@@ -208,6 +221,7 @@ class PortfolioAnalysis extends Component {
                 className="invalid-feedback"
               />
             </div>
+            <br/>
             <button type="submit">Submit</button>
           </Form>
         )
