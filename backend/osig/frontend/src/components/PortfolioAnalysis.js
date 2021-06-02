@@ -151,7 +151,7 @@ class PortfolioAnalysis extends Component {
         if(response.status != 200) {
           response.text().then(data => {
             this.setState({
-              errorMsg: "One or more of the tickers could not be found",
+              errorMsg: data,
               successMsg: '',
               submitting: ''
             });
@@ -200,22 +200,29 @@ class PortfolioAnalysis extends Component {
              render={arrayHelpers => (
                 <div>
                   {props.values.tickers && props.values.tickers.length > 0 ? (
-                    props.values.tickers.map((ticker, index) => (
-                      <div key={index}>
-                        <div>
-                        <label>Ticker Name</label>
+                    <table>
+                    <tr>
+                      <th>Ticker Name</th>
+                      <th>Weighting in Portfolio (Optional)</th> 
+                      <th>Remove Ticker</th>
+                      <th>Add ticker</th>
+                    </tr>
+                    <tbody>
+                    {props.values.tickers.map((ticker, index) => {
+                      return(
+                      <tr key = {index}>
+                        <td>
                         <span style={{display:"inline-block", width: "87px"}}></span>
                         <Field 
                         type = "text"
                         name={`tickers.${index}.name`} />
-                        </div>
-                        <br/>
-                        <div>
-                        <label>Weighting in Portfolio &emsp;</label>
+                        </td>
+                        <td>
                         <Field 
                         type = "float"
                         name={`tickers.${index}.weight`} />
-                        </div>
+                        </td>
+                        <td>
                         <br/>
                         <button
                          type="button"
@@ -223,15 +230,20 @@ class PortfolioAnalysis extends Component {
                         >
                         -
                         </button>
+                        </td>
+                        <td>
                         <button
                          type="button"
                          onClick={() => arrayHelpers.insert(index, '')} // insert an empty string at a position
                         >
                         +
                         </button>
-                        <br/>
-                     </div>
-                   ))
+                        </td>
+                     </tr>
+                    );
+                    })}
+                   </tbody>
+                   </table>
                  ) : (
                    <button type="button" onClick={() => arrayHelpers.push('')}>
                      {/* show this when user has removed all friends from the list */}

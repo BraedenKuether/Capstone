@@ -71,13 +71,25 @@ def create_run(request):
   body = request.data
   tickers = []
   weights = []
+  num_zero = 0
   for ticker in body['tickers']:
+    print(ticker)
     tickers.append(ticker['name'])
-    try:
-      weights.append(float(ticker['weight']))
-    except ValueError:
-      return HttpResponse('Invalid number for weights', status=400)
+    if 'weight' not in ticker or ticker['weight'] == '':
+      weights.append(0)
+      num_zero += 1
+    else:
+      try:
+        weights.append(float(ticker['weight']))
+      except ValueError:
+        return HttpResponse('Invalid number for weights', status=400)
   
+  if sum(weights) < 1:
+    even_distribution = (1 - sum(weights))/num_zero
+    for i, weight in enumerate(weights):
+      if weight == 0:
+        weights[i] = even_distribution
+
   if sum(weights) < 0.999 or sum(weights) > 1.0001:
     return HttpResponse('Weights do not add up to 1', status=400)
   title = body['title']

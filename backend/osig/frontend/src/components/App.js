@@ -7,7 +7,6 @@ import {
   Route,
   Link
 } from "react-router-dom";
-import Graph from "./Graph";
 import PortfolioAnalysis from "./PortfolioAnalysis";
 import RunView from "./RunView";
 
