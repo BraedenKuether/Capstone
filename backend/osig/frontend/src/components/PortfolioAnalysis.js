@@ -3,6 +3,58 @@ import { render } from "react-dom";
 import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik';
 import {ResponsiveLine} from '@nivo/line';
 
+const TableHeader = (props) => {
+    const {headers} = props;
+    return(
+      <thead className="table-active" key="header-1">
+        <tr key="header-0">
+          { headers && headers.map((value, index) => {
+              return <th key={index}><div>{value.charAt(0).toUpperCase() + value.slice(1)}</div></th>
+          })}
+        </tr>
+      </thead>
+    );
+  }
+
+const  TableBody = (props) => {
+    const { headers, rows } = props;
+
+    function buildRow(row, headers) {
+        return (
+             <tr key={row.id}>
+             { headers.map((value, index) => {
+                 if (index == 0) {
+                  let url = 'view_run/'.concat(row.id);
+                  return <td key={index}><a href={url}>{row[value]}</a></td>
+                 } else {
+                  return <td key={index}>{row[value]}</td>
+                 } 
+              })}
+             </tr>
+         )
+      };
+
+      return(
+          <tbody>
+            { rows && rows.map((value) => {
+                    return buildRow(value, headers);
+                })}
+          </tbody>
+    );
+  }
+
+const  Table = (props) => {
+    const { headers, rows } = props;
+    return (
+      <div>
+      <table className="table table-bordered table-hover">
+      <TableHeader headers={headers}></TableHeader>
+      <TableBody headers={headers} rows={rows}></TableBody>
+      </table>
+      </div>
+    );
+  }
+
 class PortfolioAnalysis extends Component {
   constructor(props) {
     super(props);
@@ -42,38 +94,23 @@ class PortfolioAnalysis extends Component {
       });
   }
   
-  renderTableHeader() {
+  
+
+  renderTable() {
     if(this.state.loaded && this.state.runs.length > 0) {
-      let header = Object.keys(this.state.runs[0])
-      return header.map((key, index) => {
-        return <th key={index}>{key.toUpperCase()}</th>
-      })
-    } else {
-      return <th></th>
+      return (
+      <div className="container p-2">
+        <div className="row">
+          <div className="col">
+            <Table headers={Object.keys(this.state.runs[0])} rows={this.state.runs} />
+          </div>
+        </div>
+      </div>
+      );
     }
   }
   
-  renderTableData() {
-    if(this.state.loaded && this.state.runs.length > 0) {
-      return this.state.runs.map((run, index) => {
-        const { id, title, date } = run //destructuring
-        let id_url = 'view_run/'.concat(id)
-        return (
-          <tr key={id}>
-            <td><a href={id_url}>{title}</a></td>
-            <td>{date}</td>
-            <td>{id}</td>
-          </tr>
-         )
-      })
-    } else {
-      return (
-        <tr>
-          <td></td>
-        </tr>
-      )
-    }
-  }
+  
   
   getCookie(name) {
     let cookieValue = null;
@@ -236,15 +273,12 @@ class PortfolioAnalysis extends Component {
         <div>
           {this.state.submitting}
         </div>
+        <br/>
+        <br/>
         {this.state.loaded &&
           <div>
-          <h1 id='title'>Previous Runs</h1>
-          <table id='runs'>
-            <tbody>
-              <tr>{this.renderTableHeader()}</tr>
-              {this.renderTableData()}
-            </tbody>
-          </table>
+          <h1 id='title' className="text-center">Previous Runs</h1>
+          {this.renderTable()}
           </div>
         }
       </div>
