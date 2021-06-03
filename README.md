@@ -77,7 +77,7 @@ The Tester object takes in 6 arguments:
 
 The Tester class also has several different functions which performs statistical analyses on the inputted portfolio. Some of these functions requires you to set the weights use the setWeights function, which is an array that has same length as the tickers array. These weights are useful to investors in case they want to put in how they weigh each asset so that they can calculate things like the total performance or the sharpe ratio. These weights do not affect the neural net training process.
 
-###Trainer.py
+### Trainer.py
 This file contains the functions for both training and testing the model. Some notable functions are:
 * train_net_earnings
   * Trains a neural network on asset history and incorporate financial data
