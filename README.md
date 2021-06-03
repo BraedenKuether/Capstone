@@ -27,7 +27,7 @@ The website code is located in the backend folder and the machine learning model
   * [Trainer.py](#trainerpy)
   
 ## Scripts
-All the following scripts is located in [backend/osig/portfolio_analysis/MLUtils](https://github.com/BraedenKuether/Capstone/tree/main/backend/osig/portfolio_analysis/MLUtils) folder.
+All the following scripts are located in [backend/osig/portfolio_analysis/MLUtils](https://github.com/BraedenKuether/Capstone/tree/main/backend/osig/portfolio_analysis/MLUtils) folder.
 
 ## Running a Model Example
 Here is a simple of running the model on three tickers: f (Ford), fb (facebook), Alphabet (googl). This example uses sandbox mode so that the it does not use up API calls.
