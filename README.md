@@ -24,6 +24,7 @@ The website code is located in the backend folder and the machine learning model
 * [Scripts](#scripts)
   * [Portfolio.py](#portfoliopy)
   * [Tester.py](#testerpy)
+  * [Triner.py](#trainerpy)
   
 ## Scripts
 All the following scripts is located in [backend/osig/portfolio_analysis/MLUtils](https://github.com/BraedenKuether/Capstone/tree/main/backend/osig/portfolio_analysis/MLUtils) folder.
@@ -73,4 +74,17 @@ The Tester object takes in 6 arguments:
   * Default 126. The length of the testing dataset. The model excludes the last test_length days from the dataset in order to evaluate the performance in the validation_set or validation_set_earnings function.
 * epochs
   * Defaults to 100. The number of epochs to train the model for.
+
+The Tester class also has several different functions which performs statistical analyses on the inputted portfolio. Some of these functions requires you to set the weights use the setWeights function, which is an array that has same length as the tickers array. These weights are useful to investors in case they want to put in how they weigh each asset so that they can calculate things like the total performance or the sharpe ratio. These weights do not affect the neural net training process.
+
+###Trainer.py
+This file contains the functions for both training and testing the model. Some notable functions are:
+* train_net_earnings
+  * Trains a neural network on asset history and incorporate financial data
+* train_net
+  * Train a neural network only on asset history.
+* validation_set_earnings
+  * Simulates returns on a neural network trained with earnings info on a price history. Returns graph of performance simulation where 1 is the starting value. EX: A performance history where the last y value is 1.5 means the model gained 50% in the simulation.
+* validation_set
+  * Same as validation set earnings, but only works with on a neural net trained with train_net
 
