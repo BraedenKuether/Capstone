@@ -48,6 +48,7 @@ print(predictions)
 ```
 
 ## Connection to Django Backend
+The website uses the machine learning tools and the Portfolio analyser to calculate several things that are displayed on each run. All of these are handled in the [backend\osig\portfolio_analysis\views.py](https://github.com/BraedenKuether/Capstone/blob/main/backend/osig/portfolio_analysis/views.py) file. The create_run function calculates all the neccessary data when a user submits a run from the front-end.
 
 ### Portfolio.py
 The portfolio constructor takes in 3 arguments:
